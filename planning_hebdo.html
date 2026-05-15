@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur Menuiserie</title>
+<style>
+:root{--bg:#f5f3ee;--sur:#fff;--sur2:#f0ede5;--bor:#ddd9cf;--bor2:#c8c4b8;--txt:#1a1916;--txt2:#58554e;--txt3:#8a8780;--acc:#2a5438;--acc2:#3d7a50;--acc-l:#e6f0ea;--warn:#b85c0a;--warn-l:#fdf0e4;--red:#a02020;--red-l:#fde8e8;--blu:#1a4a8a;--blu-l:#e6eef8;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5}
+header{background:var(--acc);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+header h1{font-size:16px;font-weight:600}
+header .hdr-ref{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:4px;color:#fff;padding:4px 10px;font-size:13px;width:240px}
+header .hdr-ref::placeholder{color:rgba(255,255,255,.6)}
+.app{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 50px);overflow:hidden}
+.side{background:var(--sur);border-right:1px solid var(--bor);overflow-y:auto;padding:12px}
+.main{overflow-y:auto;padding:16px}
+.stitle{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--bor)}
+.stitle:first-child{margin-top:0}
+input,select{padding:5px 8px;border:1px solid var(--bor2);border-radius:4px;font-size:13px;background:var(--sur);color:var(--txt);font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--acc2)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--bor2);border-radius:4px;background:var(--sur);color:var(--txt);font-size:12px;cursor:pointer;font-family:inherit;transition:all .12s}
+.btn:hover{background:var(--sur2);border-color:var(--acc2)}
+.btn-p{background:var(--acc);color:#fff;border-color:var(--acc)}.btn-p:hover{background:var(--acc2)}
+.btn-r{border-color:var(--red);color:var(--red)}.btn-r:hover{background:var(--red-l)}
+.btn-sm{padding:3px 8px;font-size:11px}
+.coef-grid{display:grid;grid-template-columns:1fr 72px;gap:4px 8px;align-items:center;font-size:12px}
+.coef-grid label{color:var(--txt2)}
+.coef-grid input{width:72px;padding:4px 6px}
+.lot-item{display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--bor);border-radius:4px;margin-bottom:3px;cursor:pointer;transition:all .12s;font-size:13px}
+.lot-item:hover{border-color:var(--acc2);background:var(--acc-l)}
+.lot-item.active{background:var(--acc-l);border-color:var(--acc);font-weight:500}
+.lot-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lot-v{font-size:11px;color:var(--txt3);white-space:nowrap}
+.lot-item.active .lot-v{color:var(--acc);font-weight:600}
+.badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;white-space:nowrap}
+.bm{background:var(--acc-l);color:var(--acc)}.bs{background:var(--warn-l);color:var(--warn)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.kpi{background:var(--sur);border:1px solid var(--bor);border-radius:6px;padding:10px 12px}
+.kpi.hl{border-color:var(--acc);background:var(--acc-l)}
+.kpi .lb{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:3px}
+.kpi .v{font-size:20px;font-weight:600;color:var(--txt)}
+.kpi.hl .v{color:var(--acc)}
+.kpi .sb{font-size:11px;color:var(--txt3);margin-top:1px}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:6px;margin-bottom:12px}
+.card-hd{background:var(--sur2);padding:8px 12px;border-bottom:1px solid var(--bor);border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.card-hd h3{font-size:13px;font-weight:600}
+.card-tt{font-size:11px;color:var(--acc)}
+.card-bd{padding:10px 12px}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);padding:4px 6px;border-bottom:1px solid var(--bor);font-weight:500}
+.tbl td{padding:4px 6px;border-bottom:1px solid var(--bor);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:var(--sur2)}
+.tbl .r{text-align:right}
+.tbl tfoot td{background:var(--sur2);font-weight:600;border-top:2px solid var(--bor2)}
+.tbl .acc{color:var(--acc);font-weight:600}
+.tabs{display:flex;border-bottom:2px solid var(--bor);margin-bottom:14px;position:sticky;top:0;z-index:60;background:var(--bg)}
+.tab{padding:6px 16px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--txt2);font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s}
+.lot-sticky{position:sticky;top:42px;z-index:50;background:var(--bg);padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--bor)}
+.lot-sticky .lot-hd{margin-bottom:10px}
+.lot-sticky .kpis{margin-bottom:0}
+.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+.tab:hover:not(.on){background:var(--sur2)}
+.pnl{display:none}.pnl.on{display:block}
+.lot-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.lot-hd .lot-name-inp{width:220px;font-size:15px;font-weight:600;padding:5px 9px}
+.add-row{text-align:right;margin-top:6px}
+/* ── Autocomplete ── */
+.ac-wrap{position:relative;display:block}
+.ac-inp{width:100%;padding:4px 7px;border:1px solid var(--bor2);border-radius:4px;font-size:12px;background:var(--sur);color:var(--txt);font-family:inherit}
+.ac-inp:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 2px rgba(42,84,56,.1)}
+.ac-drop{display:none;position:fixed;background:var(--sur);border:1px solid var(--bor2);border-radius:5px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:999;min-width:240px;max-height:220px;overflow-y:auto}
+.ac-drop.open{display:block}
+.ac-item{padding:6px 10px;font-size:12px;cursor:pointer;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-item:hover,.ac-item.sel{background:var(--acc-l);color:var(--acc)}
+.ac-item.create{color:var(--blu);border-top:1px solid var(--bor);font-style:italic}
+.ac-item.create:hover{background:var(--blu-l)}
+/* ── Autocomplete ── */
+.ac-wrap{position:relative;width:100%}
+.ac-inp{width:100%;padding:4px 7px;border:1px solid var(--bor2);border-radius:4px;font-size:12px;background:var(--sur);color:var(--txt);font-family:inherit}
+.ac-inp:focus{outline:none;border-color:var(--acc2)}
+.ac-drop{display:none;position:absolute;top:100%;left:0;right:0;background:var(--sur);border:1px solid var(--bor2);border-radius:0 0 4px 4px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:200;max-height:220px;overflow-y:auto}
+.ac-drop.open{display:block}
+.ac-item{padding:5px 9px;font-size:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ac-item:hover,.ac-item.sel{background:var(--acc-l)}
+.ac-item .ac-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-item .ac-prix{font-size:11px;color:var(--txt3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ac-create{padding:6px 9px;font-size:12px;cursor:pointer;color:var(--acc);border-top:1px solid var(--bor);font-style:italic}
+.ac-create:hover{background:var(--acc-l)}
+/* ── Modals ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-start;justify-content:center;padding-top:40px}
+.ov.open{display:flex}
+.mbox{background:#fff;border-radius:8px;display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
+.brd-item{padding:8px 12px;font-size:13px;cursor:pointer;border-left:3px solid transparent;transition:all .1s;color:var(--txt2)}
+.brd-item:hover{background:var(--acc-l);color:var(--acc)}
+.brd-item.on{background:var(--acc-l);border-left-color:var(--acc);color:var(--acc);font-weight:500}
+.brd-item .brd-sub{font-size:10px;color:var(--txt3);margin-top:1px}
+/* Tableau mobilier inline */
+.mob-hd{display:grid;grid-template-columns:1fr 52px 80px 64px 64px 80px 64px 64px;gap:4px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);padding:4px 0 6px;border-bottom:1px solid var(--bor);margin-bottom:4px}
+.mob-row{display:grid;grid-template-columns:1fr 52px 80px 64px 64px 80px 64px 64px;gap:4px;align-items:center;padding:2px 0;font-size:12.5px;border-bottom:1px solid transparent}
+.mob-row:hover{background:var(--sur2)}
+.mob-row-on{background:var(--acc-l)!important}
+.mob-row input{padding:3px 6px;font-size:12px;text-align:right;width:100%}
+.mob-dim{color:var(--txt3);font-size:11px}
+.mob-val{text-align:right;font-variant-numeric:tabular-nums;color:var(--txt2);font-size:12px}
+.mob-val-acc{color:var(--acc);font-weight:600}
+.mhd{background:var(--acc);color:#fff;padding:11px 16px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;border-radius:8px 8px 0 0}
+.mhd h3{font-size:14px;font-weight:600}
+.mhd .msub{font-size:11px;opacity:.75;margin-top:2px}
+.mcl{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:0 2px;flex-shrink:0}
+.mbody{overflow-y:auto;flex:1}
+.mft{background:var(--sur2);padding:10px 16px;border-top:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-radius:0 0 8px 8px}
+/* ── Bordereau table ── */
+.btbl{width:100%;border-collapse:collapse;font-size:12px}
+.btbl th{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--txt3);padding:5px 4px;border-bottom:1px solid var(--bor);font-weight:500;background:var(--sur2);white-space:nowrap;text-align:right}
+.btbl th:first-child{text-align:left}
+.btbl td{padding:3px 3px;border-bottom:1px solid #eee;vertical-align:middle}
+.btbl tfoot td{background:var(--sur2);font-weight:600;border-top:1px solid var(--bor2);font-size:11.5px}
+.btbl .r{text-align:right}
+.btbl input{padding:3px 5px;font-size:12px;border:1px solid var(--bor2);border-radius:3px;text-align:right}
+.btbl input.nom{text-align:left;min-width:100px}
+/* ── Mobilier table nouveau ── */
+.mtbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:800px}
+.mtbl col.mc1{width:220px}.mtbl col.mc2{width:46px}.mtbl col.mc3{width:56px}.mtbl col.mc4{width:80px}.mtbl col.mc5{width:60px}.mtbl col.mc6{width:56px}.mtbl col.mc7{width:80px}.mtbl col.mc8{width:60px}.mtbl col.mc9{width:90px}
+.mtbl thead tr:first-child th{font-size:10px;font-weight:500;padding:3px 4px 1px;text-align:center;color:var(--txt3)}
+.mtbl thead tr:first-child th.gat{color:var(--acc);border-bottom:2px solid var(--acc)}
+.mtbl thead tr:first-child th.gpo{color:var(--blu);border-bottom:2px solid var(--blu)}
+.mtbl thead tr:last-child th{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);font-weight:500;padding:4px 3px 5px;border-bottom:1px solid var(--bor);text-align:right;white-space:nowrap}
+.mtbl thead tr:last-child th:first-child,.mtbl thead tr:last-child th:nth-child(2){text-align:left}
+.mtbl td{padding:1px 2px;border-bottom:0.5px solid var(--bor);vertical-align:middle}
+.mtbl input[type=text],.mtbl input[type=number],.mtbl select{width:100%;padding:3px 4px;border:0.5px solid transparent;border-radius:3px;font-size:12px;background:transparent;color:var(--txt);font-family:inherit}
+.mtbl input[type=number]{text-align:right}
+.mtbl input:focus,.mtbl select:focus{outline:none;border-color:var(--acc);background:var(--sur)}
+.mtbl .msec td{background:var(--sur2);border-top:1px solid var(--bor);border-bottom:1px solid var(--bor);padding:3px 6px}
+.mtbl .mpill{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.mtbl .mcalc{text-align:right;font-size:12px;padding:3px 5px;color:var(--acc);font-weight:500;font-variant-numeric:tabular-nums}
+.mtbl .mcalc.po{color:var(--blu)}
+.mtbl tfoot td{background:var(--sur2);font-weight:600;border-top:2px solid var(--bor2);padding:5px 7px}
+.mtbl .mact{text-align:right;padding:1px 3px;white-space:nowrap}
+.mab{display:inline-flex;align-items:center;justify-content:center;width:24px;height:20px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;border:1px solid}
+.mab-add{background:#e6f0ea;color:#2a5438;border-color:#9ecfb0}.mab-add:hover{background:#c8e8d4}
+.mab-del{background:#fde8e8;color:#a02020;border-color:#f0b0b0}.mab-del:hover{background:#f8c8c8}
+.mins-sel{display:none;background:var(--sur2);border:1px solid var(--bor);border-radius:4px;padding:3px;margin-top:2px;gap:2px;flex-direction:column}
+.mins-sel.open{display:flex}
+.mins-sel button{padding:4px 8px;border:1px solid var(--bor);border-radius:3px;background:var(--sur);font-size:11px;cursor:pointer;font-family:inherit;text-align:left;color:var(--txt)}
+.mins-sel button:hover{background:var(--acc-l);border-color:var(--acc);color:var(--acc)}
+.mins-sel button.msopt{color:var(--blu)}.mins-sel button.msopt:hover{background:var(--blu-l);border-color:var(--blu)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Calculateur Menuiserie</h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="/" style="color:#fff;font-size:12px;opacity:.8;text-decoration:none;border:1px solid rgba(255,255,255,.4);padding:4px 10px;border-radius:4px;white-space:nowrap" onclick="saveNow()">← Accueil</a>
+    <input class="hdr-ref" id="ref" type="text" value="9214_1 — Kitchen &amp; Coffee Corner" placeholder="Référence chantier" oninput="autoSave()">
+    <!-- Dates chantier (pour export planning) -->
+    <span style="display:inline-flex;gap:4px;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:2px 8px;font-size:11px;color:rgba(255,255,255,.85)">
+      <label for="date_debut" style="opacity:.75">Début</label>
+      <input id="date_debut" type="date" style="border:none;background:transparent;color:#fff;font-size:11px;padding:2px;outline:none;font-family:inherit" title="Date de début de chantier" oninput="autoSave()">
+      <label for="date_fin" style="opacity:.75;margin-left:4px">Fin</label>
+      <input id="date_fin" type="date" style="border:none;background:transparent;color:#fff;font-size:11px;padding:2px;outline:none;font-family:inherit" title="Date de fin de chantier" oninput="autoSave()">
+    </span>
+    <button class="btn btn-sm" style="background:#e6f0ea;border-color:#a9dfbf;color:#1e8449" onclick="exportPlanning()" title="Télécharger un JSON pour le planning (heures agrégées + dates)">📅 Planning</button>
+    <button class="btn btn-sm" style="background:#fff8e0;border-color:#e8d080;color:#5a4000" onclick="ouvrirOffre()" title="Générer l'offre client">📄 Offre</button>
+    <button class="btn btn-sm" style="background:#e8f0fb;border-color:#b0c8e8;color:#1a3a6a" onclick="recalculerDepuisOffre()" title="Mettre à jour les quantités depuis l'offre">↺ Qtés offre</button>
+    <span id="save-status" style="font-size:11px;opacity:.65;white-space:nowrap"></span>
+    <span id="bd-status" style="font-size:11px;opacity:.75;white-space:nowrap"></span>
+    <a href="/bd-prix" target="_blank" style="color:#fff;font-size:12px;opacity:.8;text-decoration:none;border:1px solid rgba(255,255,255,.4);padding:3px 9px;border-radius:4px;white-space:nowrap">BD Prix ↗</a>
+  </div>
+</header>
+
+<div class="app">
+<aside class="side">
+  <div class="stitle">Coefficients de marge</div>
+  <div class="coef-grid">
+    <label>Matériaux / Chants</label><input id="cm" type="number" step=".01" value="1.27" oninput="ra()">
+    <label>Quincaillerie</label><input id="cq" type="number" step=".01" value="1.27" oninput="ra()">
+    <label>Sous-traitants</label><input id="cs" type="number" step=".01" value="1.27" oninput="ra()">
+    <label>Main-d'œuvre</label><input id="cmo" type="number" step=".01" value="1.27" oninput="ra()">
+  </div>
+  <div class="stitle">Taux horaires achat (€/h)</div>
+  <div class="coef-grid">
+    <label>Offre</label><input id="tof" type="number" step=".5" value="68.86" oninput="ra()">
+    <label>Étude</label><input id="tet" type="number" step=".5" value="66.61" oninput="ra()">
+    <label>Atelier</label><input id="ta" type="number" step=".5" value="51.17" oninput="ra()">
+    <label>Déligneuse</label><input id="tdl" type="number" step=".5" value="19.21" oninput="ra()">
+    <label>Colleuse de chant</label><input id="tcl" type="number" step=".5" value="26.58" oninput="ra()">
+    <label>Numérique (CNC)</label><input id="tm" type="number" step=".5" value="24.89" oninput="ra()">
+    <label>Pose</label><input id="tp" type="number" step=".5" value="47.27" oninput="ra()">
+    <label>Transport</label><input id="tt" type="number" step=".5" value="44.69" oninput="ra()">
+    <label>Gros œuvre</label><input id="tg" type="number" step=".5" value="50.08" oninput="ra()">
+    <label>Ferr. / Finition</label><input id="tf" type="number" step=".5" value="44.30" oninput="ra()">
+    <label title="Coeff. charge appliqué aux heures atelier/machine">Coeff. charge ×</label><input id="cc" type="number" step=".01" value="1.15" oninput="ra()">
+  </div>
+  <div class="stitle">Lots du chantier</div>
+  <div id="lot-list"></div>
+  <div style="margin-top:8px"><button class="btn btn-p" style="width:100%" onclick="addLot()">+ Ajouter lot</button></div>
+</aside>
+
+<main class="main">
+  <div class="tabs">
+    <button class="tab on" id="btn-lot" onclick="showTab('lot')">Détail lot</button>
+    <button class="tab" id="btn-res" onclick="showTab('res')">Résumé chantier</button>
+  </div>
+  <div class="pnl on" id="pnl-lot"><div id="lot-detail"></div></div>
+  <div class="pnl" id="pnl-res"><div id="resume"></div></div>
+</main>
+</div>
+
+<!-- ══ Modal Bordereaux (multi, niveau lot) ══ -->
+<div class="ov" id="bov">
+<div class="mbox" style="width:980px;max-width:calc(100vw - 24px);max-height:calc(100vh - 80px)">
+  <div class="mhd">
+    <div><h3>Bordereaux du lot</h3><div class="msub">Bordereaux du lot actif uniquement</div></div>
+    <button class="mcl" onclick="closeBord()">✕</button>
+  </div>
+  <div class="mbody" style="padding:0;display:flex;overflow:hidden;flex:1">
+    <!-- Liste des bordereaux (colonne gauche) -->
+    <div id="brd-list-col" style="width:200px;flex-shrink:0;border-right:1px solid var(--bor);overflow-y:auto;background:var(--sur2)">
+      <div style="padding:10px 10px 6px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3)">Bordereaux</div>
+      <div id="brd-list"></div>
+      <div style="padding:8px 10px">
+        <button class="btn btn-sm btn-p" style="width:100%" onclick="addBordereau()">+ Nouveau bordereau</button>
+      </div>
+    </div>
+    <!-- Contenu du bordereau actif (colonne droite) -->
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;min-width:0">
+      <div id="brd-empty" style="color:var(--txt3);font-size:13px;font-style:italic;padding:20px 0;display:none">
+        Créez ou sélectionnez un bordereau.
+      </div>
+      <div id="brd-content" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <input id="brd-name-inp" type="text" placeholder="Nom du bordereau…"
+            style="font-size:15px;font-weight:600;flex:1;padding:5px 9px"
+            oninput="renameBrd(this.value)">
+          <button class="btn btn-r btn-sm" onclick="deleteBrd()">Supprimer</button>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="btbl">
+          <thead><tr>
+            <th style="text-align:left;min-width:130px">Désignation</th>
+            <th style="width:78px">Long (m)</th>
+            <th style="width:78px">Larg (m)</th>
+            <th style="width:46px">Nb</th>
+            <th style="width:80px;color:var(--acc)">Total m²</th>
+            <th style="width:76px">ML périm.</th>
+            <th style="width:48px" title="Nb chants côtés Long">Ch. Long</th>
+            <th style="width:48px" title="Nb chants côtés Larg">Ch. Larg</th>
+            <th style="width:80px;color:var(--acc)">Chants ml</th>
+            <th style="width:26px"></th>
+          </tr></thead>
+          <tbody id="btbody"></tbody>
+          <tfoot><tr>
+            <td colspan="4" style="font-size:11px;color:var(--txt3)">Sous-total net</td>
+            <td class="r acc" id="bnet_m2">—</td>
+            <td class="r" style="color:var(--txt2)" id="bnet_ml">—</td>
+            <td class="r" id="bnet_chl">—</td>
+            <td class="r" id="bnet_chc">—</td>
+            <td class="r acc" id="bnet_cht">—</td>
+            <td></td>
+          </tr></tfoot>
+        </table>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button class="btn btn-sm btn-p" onclick="addBordRow()">+ Pièce</button>
+          <button class="btn btn-sm" onclick="addBordSection()">+ Section</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mft">
+    <div style="font-size:13px" id="brd-totals">
+      Total net : <strong style="color:var(--acc);font-size:15px" id="bbrut_m2">0.000 m²</strong>
+      &nbsp;·&nbsp; Chants : <strong style="color:var(--acc)" id="bbrut_cht">0.000 ml</strong>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="closeBord()">Fermer</button>
+      <button class="btn btn-p" onclick="saveBord()">Appliquer</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+<script>
+// ─── Tableau mobilier — taux depuis API serveur ───────────────────────────────
+let _mobTaux = []; // structure commune (articles / sections)
+let _mobModelList = [];
+let _mobModelCache = {};
+let _mobActiveModelId = null;
+
+function getMobTaux(){ return _mobTaux; }
+function getLotMobModelId(lot=null){
+  const id = parseInt((lot?.mob_modele_id ?? _mobActiveModelId ?? 0),10);
+  return Number.isFinite(id) ? id : (_mobActiveModelId||0);
+}
+function getMobRowsForLot(lot=null){
+  const modelId = getLotMobModelId(lot);
+  const cached = _mobModelCache[modelId];
+  if(cached && Array.isArray(cached.rows)) return cached.rows.map(r=>({...r}));
+  return getMobTaux().map(r=>({...r}));
+}
+function buildMOB(lot=null){
+  return getMobRowsForLot(lot).filter(r=>r.type==='row').map((r,i)=>[
+    'mob'+i, r.desc||'', r.unit||'pc',
+    (parseFloat(r.mat)||0)/60,
+    (parseFloat(r.mpo)||0)/60
+  ]);
+}
+let MOB = buildMOB(); // sera reconstruit après chargement async
+
+function ensureLotMobEntries(lot){
+  const rows = getMobRowsForLot(lot).filter(r => r.type === 'row');
+  const oldMob = Array.isArray(lot.mob) ? lot.mob : [];
+  const byId = new Map();
+  oldMob.forEach((m, idx) => {
+    if (m.qty != null && m.qty_at == null) { m.qty_at = m.qty; m.qty_po = m.qty; delete m.qty; }
+    if (m.row_id != null) byId.set(String(m.row_id), m);
+  });
+  lot.mob = rows.map((row, idx) => {
+    let src = null;
+    if (row.id != null && byId.has(String(row.id))) src = byId.get(String(row.id));
+    if (!src) src = oldMob[idx] || {};
+    return {
+      row_id: row.id != null ? row.id : null,
+      qty_at: parseFloat(src.qty_at ?? src.qty ?? 0) || 0,
+      qty_po: parseFloat(src.qty_po ?? src.qty ?? 0) || 0,
+    };
+  });
+}
+
+async function loadMobModelsMeta(){
+  const res = await fetch('/api/mob/modeles');
+  const data = await res.json();
+  _mobModelList = data.items || [];
+  _mobActiveModelId = data.active_model_id || (_mobModelList[0]?.id||0);
+}
+
+async function ensureMobModelLoaded(modelId){
+  modelId = parseInt(modelId||0,10);
+  if(!modelId) return null;
+  if(_mobModelCache[modelId]) return _mobModelCache[modelId];
+  const res = await fetch('/api/mob/modeles/' + modelId);
+  if(!res.ok) return null;
+  const data = await res.json();
+  _mobModelCache[modelId] = data;
+  return data;
+}
+
+function getMobModelName(modelId){
+  return (_mobModelList.find(m=>String(m.id)===String(modelId))||{}).nom || ('Modèle ' + modelId);
+}
+
+async function changeLotMobModel(modelId){
+  if(act===null || act>=lots.length) return;
+  const lot = lots[act];
+  lot.mob_modele_id = parseInt(modelId||0,10) || _mobActiveModelId || 0;
+  await ensureMobModelLoaded(lot.mob_modele_id);
+  ensureLotMobEntries(lot);
+  ra();
+}
+
+// ─── BD Prix ────────────────────────────────────────────────────────────────
+const BD_KEY='menuiserie_bd_v1';
+const FM=[
+  {l:'Mela blanc STD 8mm',p:6.45},{l:'Mela blanc STD 18mm',p:5.59},
+  {l:'Mela noir 8mm',p:9.27},{l:'Mela noir 18mm',p:7.82},
+  {l:'Unilin C0113 MST Super matt 0.8mm',p:53.49},{l:'Unilin C0113 V1A Dainty oak 0.8mm',p:37.60},
+  {l:'Unilin C0113 CST Soft pearl 0.8mm',p:20.56},{l:'Unilin O0113 MST Super matt 0.7mm',p:34.73},
+  {l:'Formica Fenix NTM 0.9mm',p:52.50},{l:'Egger U999 TopMatt 0.8mm',p:32.43},
+  {l:'Polyrey N005 Touch 0.8mm',p:27.63},{l:'Polyrey N005 Extra matt 0.8mm',p:11.54},
+  {l:'MDF 16.5mm',p:7.11},{l:'MDF 18mm',p:7.66},{l:'MDF 28mm',p:14.95},
+  {l:'MDF Hydro 18mm',p:8.17},{l:'MDF Firax 18mm',p:19.25},{l:'MDF X-Light 50mm',p:33.48},
+  {l:'Hi-Macs 12mm',p:218.59},{l:'Corian 12mm',p:290.58},{l:'Kerrock Snow fall',p:199.00},
+  {l:'Panneau feutre (à compléter)',p:0},{l:'Personnalisé',p:0},
+];
+const FC=[
+  {l:'Chant ABS 0.5mm blanc',p:0.80},{l:'Chant ABS 0.5mm noir',p:0.85},
+  {l:'Chant ABS 1mm blanc',p:1.00},{l:'Chant ABS 1mm noir',p:1.10},
+  {l:'Chant ABS 2mm blanc',p:1.40},{l:'Chant chêne massif 2mm',p:3.20},
+  {l:'Chant Unilin CST 0.4mm',p:2.20},{l:'Personnalisé',p:0},
+];
+const FQ=[
+  {l:'Charnière + embasse Blum cuisine',p:3.73},{l:'Charnière Blum Clip Top 110°',p:4.20},
+  {l:'Tiroir Blum Tandembox S',p:65.00},{l:'Tiroir Blum Tandembox M',p:97.75},
+  {l:'Tiroir Blum Tandembox L',p:172.50},{l:'Pousse-lâche long',p:3.70},
+  {l:'Pieds plastiques réglables',p:1.73},{l:'Socle MDF + petits pieds (ml)',p:27.60},
+  {l:'Serrure basic meuble',p:23.00},{l:'Poignée Viefe 40mm',p:5.26},
+  {l:'Poignée Viefe 110mm',p:12.95},{l:'LED ruban (ml)',p:85.00},
+  {l:'Passe-câble',p:20.00},{l:'Twist 2×220V',p:94.47},{l:'Twist 1×220V+2×USB',p:134.47},
+  {l:'Pix 1×220V',p:35.97},{l:'Poubelle encastrée',p:150.00},
+  {l:'Tube penderie alu ovale (ml)',p:9.20},{l:'Tube penderie inox rond (ml)',p:41.40},
+];
+function getBD(){try{const d=localStorage.getItem(BD_KEY);return d?JSON.parse(d):null}catch(e){return null}}
+function bdM(){const b=getBD();if(!b)return FM;return(b.mat||[]).map(it=>({l:`${it.ref}${it.ep?' — '+it.ep+'mm':''}`,p:it.p_achat})).concat([{l:'Personnalisé',p:0}])}
+function bdC(){const b=getBD();if(!b)return FC;return(b.cha||[]).map(it=>({l:it.ref,p:it.p_achat})).concat([{l:'Personnalisé',p:0}])}
+function bdQ(){const b=getBD();if(!b)return FQ;return[...(b.qui||[]),...(b.acc||[])].map(it=>({l:it.ref,p:it.p_achat}))}
+function updBD(){const b=getBD();const el=document.getElementById('bd-status');if(!el)return;el.textContent=b?`BD: ${Object.values(b).reduce((s,a)=>s+a.length,0)} articles`:'Catalogue intégré';}
+
+async function syncBDFromServer(){
+  try{
+    const res = await fetch('/api/bd');
+    if(!res.ok) return;
+    const all = await res.json();
+    const grouped = {mat:[], cha:[], qui:[], acc:[]};
+    all.forEach(it=>{
+      const sec = it.section || 'mat';
+      if(!grouped[sec]) grouped[sec] = [];
+      grouped[sec].push(it);
+    });
+    localStorage.setItem(BD_KEY, JSON.stringify(grouped));
+    updBD();
+  }catch(e){
+    console.error('Erreur sync BD', e);
+  }
+}
+
+
+const AUTO_CFG_DEFAULTS = {
+  plan_pct: 0.35,
+  admin_div: 3600,
+  suivi_pct: 0.17,
+  suivi_prod_pct: 0.10,
+  prg_div: 2,
+  deli_mlph: 330,
+  deli_factor: 6,
+  deli_machine_mult: 0.8,
+  chant_mlph: 195,
+  chant_factor: 7.4,
+  chant_machine_mult: 0.8,
+  cnc_div: 12,
+  cnc_machine_mult: 0.8,
+  demont_div: 6,
+};
+let AUTO_CFG = {...AUTO_CFG_DEFAULTS};
+
+function setIfPresent(id, value){
+  const el = document.getElementById(id);
+  if(el && value !== undefined && value !== null && value !== '') el.value = value;
+}
+
+async function loadGlobalCalcParams(){
+  try{
+    const res = await fetch('/api/parametres');
+    if(!res.ok) return;
+    const p = await res.json();
+    setIfPresent('cm', p.coeff_mat);
+    setIfPresent('cq', p.coeff_quinc);
+    setIfPresent('cs', p.coeff_stt);
+    setIfPresent('cmo', p.coeff_mo);
+    setIfPresent('tof', p.th_offre);
+    setIfPresent('tet', p.th_etude);
+    setIfPresent('ta', p.th_atelier);
+    setIfPresent('tdl', p.th_deligneuse);
+    setIfPresent('tcl', p.th_colleuse);
+    setIfPresent('tm', p.th_numerique);
+    setIfPresent('tp', p.th_pose);
+    setIfPresent('tt', p.th_transport);
+    setIfPresent('tg', p.th_gros_oeuvre);
+    setIfPresent('tf', p.th_fers);
+    AUTO_CFG = {
+      plan_pct: parseFloat(p.auto_plan_pct)||AUTO_CFG_DEFAULTS.plan_pct,
+      admin_div: parseFloat(p.auto_admin_div)||AUTO_CFG_DEFAULTS.admin_div,
+      suivi_pct: parseFloat(p.auto_suivi_pct)||AUTO_CFG_DEFAULTS.suivi_pct,
+      suivi_prod_pct: parseFloat(p.auto_suivi_prod_pct)||AUTO_CFG_DEFAULTS.suivi_prod_pct,
+      prg_div: parseFloat(p.auto_prg_div)||AUTO_CFG_DEFAULTS.prg_div,
+      deli_mlph: parseFloat(p.auto_deli_mlph)||AUTO_CFG_DEFAULTS.deli_mlph,
+      deli_factor: parseFloat(p.auto_deli_factor)||AUTO_CFG_DEFAULTS.deli_factor,
+      deli_machine_mult: parseFloat(p.auto_deli_machine_mult)||AUTO_CFG_DEFAULTS.deli_machine_mult,
+      chant_mlph: parseFloat(p.auto_chant_mlph)||AUTO_CFG_DEFAULTS.chant_mlph,
+      chant_factor: parseFloat(p.auto_chant_factor)||AUTO_CFG_DEFAULTS.chant_factor,
+      chant_machine_mult: parseFloat(p.auto_chant_machine_mult)||AUTO_CFG_DEFAULTS.chant_machine_mult,
+      cnc_div: parseFloat(p.auto_cnc_div)||AUTO_CFG_DEFAULTS.cnc_div,
+      cnc_machine_mult: parseFloat(p.auto_cnc_machine_mult)||AUTO_CFG_DEFAULTS.cnc_machine_mult,
+      demont_div: parseFloat(p.auto_demont_div)||AUTO_CFG_DEFAULTS.demont_div,
+    };
+  }catch(e){
+    console.error('Erreur chargement paramètres globaux', e);
+  }
+}
+
+function calcSttRow(s, defaultMarge){
+  const pu = parseFloat(s?.pu)||0;
+  const qty_l = parseFloat(s?.qty_l)||0;
+  const nb_p = parseFloat(s?.nb_p)||0;
+  const total = (parseFloat(s?.total)||0) || ((qty_l||nb_p)? qty_l*nb_p : 0);
+  const calcMt = pu * total;
+  let mt = parseFloat(s?.mt)||0;
+  if(!mt && calcMt) mt = calcMt;
+  let vente = parseFloat(s?.vente)||0;
+  let marge = parseFloat(s?.marge)||0;
+  if(!marge){
+    marge = (mt && vente) ? (vente/mt) : (defaultMarge||1);
+  }
+  if(!vente && mt){
+    vente = mt * marge;
+  }
+  const mismatch = !!(mt && calcMt && Math.abs(mt - calcMt) > 0.01);
+  return {pu, qty_l, nb_p, total, calcMt, mt, marge, vente, mismatch};
+}
+
+// ─── State ──────────────────────────────────────────────────────────────────
+let lots=[],act=null;
+let chantierBordereaux=[]; // bordereaux globaux du chantier
+function gv(id){return parseFloat(document.getElementById(id).value)||0}
+function coefValue(v, defVal=1){
+  if(v===undefined || v===null || v==='') return defVal;
+  const n=parseFloat(String(v).replace(',', '.'));
+  return Number.isFinite(n) ? n : defVal;
+}
+function setObjCoef(obj, fld, raw, defVal=1){
+  if(raw===undefined || raw===null || String(raw).trim()===''){ obj[fld]=defVal; return; }
+  const n=parseFloat(String(raw).replace(',', '.'));
+  obj[fld]=Number.isFinite(n) ? n : defVal;
+}
+function C(){return{cm:gv('cm'),cq:gv('cq'),cs:gv('cs'),cmo:gv('cmo'),tof:gv('tof'),tet:gv('tet'),ta:gv('ta'),tdl:gv('tdl'),tcl:gv('tcl'),tm:gv('tm'),tp:gv('tp'),tt:gv('tt'),tg:gv('tg'),tf:gv('tf'),cc:gv('cc')}}
+function AC(lot=lots[act]){return {...AUTO_CFG, ...((lot&&lot.auto_cfg)||{})};}
+
+function newMat(desc,pu){return{desc,pu,qty:0,pieces:[],coeff_chute:1.3};}
+
+function newLot(name,type='menuiserie'){
+  const mob = buildMOB().map(() => ({ qty_at: 0, qty_po: 0 }));
+  return{name,type,
+    dans_offre: true,
+    qty: 1,
+    mob_modele_id: _mobActiveModelId || (_mobModelList[0]?.id||0),
+    auto_cfg:{},
+    bordereaux:[],
+    mats:[{desc:'',pu:0,qty:0,brd_id:'',coeff_chute:1.3}],
+    chants:[{desc:'',pu:0,qty:0,brd_id:'',coeff_cht:1.0}],
+    quinc:[{desc:'',pu:0,qty:0}],
+    stt:[{desc:'',pu:0,qty_l:0,nb_p:0,total:0,mt:0,marge:0,vente:0}],
+    mob,
+    h_offre:0,h_mesures:0,h_etude:0,h_admin:0,h_suivi:0,h_suivi_p:0,h_prg:0,
+    h_collage:0,h_cnc_mo:0,
+    h_emballage:0,h_transport:0,h_pose:0,h_fer:0,h_go:0,h_finition:0,
+  };
+}
+
+function getLotBordereauIds(lot=lots[act]){
+  const ids=[];
+  const pushId=id=>{ if(id && !ids.includes(id)) ids.push(id); };
+  (lot?.bordereaux||[]).forEach(b=>pushId(b.id));
+  (lot?.mats||[]).forEach(m=>pushId(m.brd_id));
+  (lot?.chants||[]).forEach(ch=>pushId(ch.brd_id));
+  return ids;
+}
+
+function getLotBordereaux(lot=lots[act]){
+  const ids=getLotBordereauIds(lot);
+  return ids.map(id=>{
+    return chantierBordereaux.find(x=>x.id===id) || (lot?.bordereaux||[]).find(x=>x.id===id);
+  }).filter(Boolean);
+}
+
+function getLotBordStats(lot=lots[act]){
+  const stats={m2:0,ml:0,cht:0,pcs:0};
+  const seen=new Set();
+  getLotBordereaux(lot).forEach(b=>{
+    if(!b || seen.has(b.id)) return;
+    seen.add(b.id);
+    let bm2=0,bml=0,bcht=0,bpcs=0;
+    (b.pieces||[]).forEach(p=>{
+      if(p.type==='section') return;
+      const l=parseFloat(p.long)||0, la=parseFloat(p.larg)||0, n=parseFloat(p.nb)||1;
+      const chl=parseFloat(p.ch_l)||0, chc=parseFloat(p.ch_c)||0;
+      bm2 += l*la*n;
+      bml += ((l+la)*2)*n;
+      bcht += ((l*chl)+(la*chc))*n;
+      bpcs += n;
+    });
+    let idx=1;
+    const linkedMat=(lot?.mats||[]).find(m=>m.brd_id===b.id);
+    if(linkedMat && bm2>0 && (parseFloat(linkedMat.qty)||0)>0){
+      idx=(parseFloat(linkedMat.qty)||0)/(bm2*(parseFloat(linkedMat.coeff_chute)||1));
+      if(!isFinite(idx) || idx<=0) idx=1;
+    }
+    stats.m2 += bm2*idx;
+    stats.ml += bml*idx;
+    stats.cht += bcht*idx;
+    stats.pcs += bpcs*idx;
+  });
+  return stats;
+}
+
+
+
+function calcLot(lot){
+  const c=C();
+  // Bordereaux du lot
+  const brdsC=getLotBordereaux(lot); // bordereaux du lot actif
+  function _brdM2(id,coeff){
+    const b=brdsC.find(x=>x.id===id);if(!b)return 0;
+    let m2=0;(b.pieces||[]).forEach(p=>{const l=parseFloat(p.long)||0,la=parseFloat(p.larg)||0,n=parseFloat(p.nb)||1;m2+=l*la*n;});
+    return parseFloat((m2*(coeff||1)).toFixed(3));
+  }
+  function _brdCht(id,coeff){
+    const b=brdsC.find(x=>x.id===id);if(!b)return 0;
+    let cht=0;(b.pieces||[]).forEach(p=>{const l=parseFloat(p.long)||0,la=parseFloat(p.larg)||0,n=parseFloat(p.nb)||1;const chl=parseInt(p.ch_l)||0,chc=parseInt(p.ch_c)||0;cht+=((l*chl)+(la*chc))*n;});
+    return parseFloat((cht*(coeff||1)).toFixed(3));
+  }
+  let mat_a=0;
+  lot.mats.forEach(m=>{
+    if(m.brd_id&&brdsC.length) m.qty=_brdM2(m.brd_id,m.coeff_chute||1.3);
+    mat_a+=(m.pu||0)*(m.qty||0);
+  });
+  lot.chants.forEach(ch=>{
+    if(ch.brd_id&&brdsC.length) ch.qty=_brdCht(ch.brd_id,ch.coeff_cht||1);
+    mat_a+=(ch.pu||0)*(ch.qty||0);
+  });
+  let quinc_a=0;lot.quinc.forEach(q=>{
+    const qty=coefValue(q.pc_u,1)*coefValue(q.nb_u,1)*coefValue(q.coef,1);
+    quinc_a+=(q.pu||0)*qty;
+  });
+  let stt_a=0, stt_v_detail=0;
+  lot.stt.forEach(s=>{
+    const rs = calcSttRow(s, c.cs);
+    stt_a += rs.mt||0;
+    stt_v_detail += rs.vente||0;
+  });
+  let h_mob_at=0,h_mob_po=0;
+  const mh=getMobH(lot);h_mob_at=mh.h_mob_at;h_mob_po=mh.h_mob_po;
+
+  // Totaux des bordereaux du lot (logique Excel MAT 1 / MAT 2 / MAT 3)
+  const _mbs=getLotBordStats(lot);
+  const _mat_ml=parseFloat((_mbs.ml||0).toFixed(3));
+  const _mat_cht=parseFloat((_mbs.cht||0).toFixed(3));
+  const _mat_pcs=parseFloat((_mbs.pcs||0).toFixed(3));
+
+  // Formules auto (alignées sur l'Excel)
+  const ac = AC(lot);
+  const h_collage = lot.h_collage||0;
+  const h_mesures = lot.h_mesures||0;
+  const h_emballage = lot.h_emballage||0;
+  const h_transport = lot.h_transport||0;
+  const h_fer = lot.h_fer||0;
+  const h_go = lot.h_go||0;
+
+  const raw_deli_mo_base = parseFloat(((_mat_ml/(ac.deli_mlph||330))*(ac.deli_factor||6)).toFixed(3));
+  const raw_chant_mo_base = parseFloat(((_mat_cht/(ac.chant_mlph||195))*(ac.chant_factor||7.4)).toFixed(3));
+  const raw_cnc_mo_base = parseFloat(((_mat_pcs/(ac.cnc_div||12))).toFixed(3));
+  const raw_montage_base = parseFloat((h_mob_at).toFixed(3));
+  const raw_pose_base = parseFloat((h_mob_po).toFixed(3));
+
+  function _v(fld, autoVal){
+    return lot[fld+'_override']===true ? (lot[fld]||0) : autoVal;
+  }
+  function _syncAuto(fld, autoVal){
+    if(!lot[fld+'_override']) lot[fld]=autoVal;
+    return _v(fld, autoVal);
+  }
+
+  // Chaîne de dépendances : si une ligne AUTO est passée en manuel,
+  // les lignes AUTO qui en dépendent doivent se recalculer sur cette valeur manuelle.
+  const _deli_mo_v = _syncAuto('h_deli_mo', raw_deli_mo_base);
+  const raw_deli_m = parseFloat((_deli_mo_v*(ac.deli_machine_mult||0.8)).toFixed(3));
+  const _deli_m_v = _syncAuto('h_deli_m', raw_deli_m);
+
+  const _chant_mo_v = _syncAuto('h_chant_mo', raw_chant_mo_base);
+  const raw_chant_m = parseFloat((_chant_mo_v*(ac.chant_machine_mult||0.8)).toFixed(3));
+  const _chant_m_v = _syncAuto('h_chant_m', raw_chant_m);
+
+  const _cnc_mo_v = _syncAuto('h_cnc_mo', raw_cnc_mo_base);
+  const raw_cnc_m = parseFloat((_cnc_mo_v*(ac.cnc_machine_mult||0.8)).toFixed(3));
+  const _cnc_m_v = _syncAuto('h_cnc_m', raw_cnc_m);
+
+  const _montage_v = _syncAuto('h_montage', raw_montage_base);
+  const raw_demont = parseFloat((_montage_v/(ac.demont_div||6)).toFixed(3));
+  const _demont_v = _syncAuto('h_demontage', raw_demont);
+
+  const _pose_v = _syncAuto('h_pose', raw_pose_base);
+
+  const raw_prg = parseFloat((_cnc_mo_v/(ac.prg_div||2)).toFixed(3));
+  const _prg_v = _syncAuto('h_prg', raw_prg);
+
+  const raw_suivi_prod = parseFloat(((_deli_m_v+_chant_m_v+_chant_mo_v+_cnc_mo_v+_montage_v+_demont_v+h_emballage+h_transport+h_fer+h_go)*(ac.suivi_prod_pct||0.10)).toFixed(3));
+  const _suivi_prod_v = _syncAuto('h_suivi_p', raw_suivi_prod);
+
+  const base_gestion = parseFloat((h_collage+_deli_mo_v+_chant_mo_v+_cnc_mo_v+_montage_v+_demont_v+h_emballage+h_transport+_pose_v+h_fer+h_go).toFixed(3));
+
+  const raw_plan = parseFloat(((_suivi_prod_v+_prg_v+base_gestion)*(ac.plan_pct||0.35)).toFixed(3));
+  const _plan_v = _syncAuto('h_etude', raw_plan);
+
+  const _coef = fld => coefValue(lot[fld+'_coef'],1);
+  const rowVente = (hv, coef, taux) => (parseFloat(hv)||0) * coefValue(coef,1) * (parseFloat(taux)||0) * coefValue(c.cmo,1);
+  const raw_admin = parseFloat(((
+      mat_a*c.cm + quinc_a*c.cq + stt_v_detail +
+      rowVente((lot.h_offre||0), _coef('h_offre'), c.tof) +
+      rowVente(h_mesures, _coef('h_mesures'), c.tof) +
+      rowVente(_plan_v, _coef('h_etude'), c.tet) +
+      rowVente(_suivi_prod_v, _coef('h_suivi_p'), c.ta) +
+      rowVente(_prg_v, _coef('h_prg'), c.ta) +
+      rowVente(h_collage, _coef('h_collage'), c.cc*c.ta) +
+      rowVente(_deli_m_v, _coef('h_deli_m'), c.cc*c.tdl) +
+      rowVente(_deli_mo_v, _coef('h_deli_mo'), c.cc*c.ta) +
+      rowVente(_chant_m_v, _coef('h_chant_m'), c.cc*c.tcl) +
+      rowVente(_chant_mo_v, _coef('h_chant_mo'), c.cc*c.ta) +
+      rowVente(_cnc_m_v, _coef('h_cnc_m'), c.cc*c.tm) +
+      rowVente(_cnc_mo_v, _coef('h_cnc_mo'), c.cc*c.ta) +
+      rowVente(_montage_v, _coef('h_montage'), c.cc*c.ta) +
+      rowVente(_demont_v, _coef('h_demontage'), c.cc*c.ta) +
+      rowVente(h_emballage, _coef('h_emballage'), c.cc*c.ta) +
+      rowVente(h_transport, _coef('h_transport'), c.tt) +
+      rowVente(_pose_v, _coef('h_pose'), c.tp) +
+      rowVente(h_fer, _coef('h_fer'), c.tf) +
+      rowVente(h_go, _coef('h_go'), c.tg)
+    )/(ac.admin_div||3600)).toFixed(3));
+  const _admin_v = _syncAuto('h_admin', raw_admin);
+
+  const raw_suivi = parseFloat((base_gestion*(ac.suivi_pct||0.17)).toFixed(3));
+  const _suivi_v = _syncAuto('h_suivi', raw_suivi);
+
+  lot.h_pose_mob = _pose_v;
+  lot.h_cnc_m_auto = _cnc_m_v;
+  lot._auto_prg = raw_prg;
+  lot._auto_suivi_prod = raw_suivi_prod;
+  lot._auto_plan = raw_plan;
+  lot._auto_admin = raw_admin;
+  lot._auto_suivi = raw_suivi;
+
+  const cc=c.cc;
+  // Quantité du lot (nombre de fois réalisé)
+  const qty = lot.qty||1;
+  // Coefs multiplicateurs (défaut 1)
+  const mo_e=(lot.h_offre||0)*_coef('h_offre')*c.tof + h_mesures*_coef('h_mesures')*c.tof + _plan_v*_coef('h_etude')*c.tet + _admin_v*_coef('h_admin')*c.tet + _suivi_v*_coef('h_suivi')*c.tet + _suivi_prod_v*_coef('h_suivi_p')*c.ta;
+  const mo_prg=_prg_v*_coef('h_prg')*c.ta;
+  const mo_m=(_deli_m_v*_coef('h_deli_m'))*cc*c.tdl + (_chant_m_v*_coef('h_chant_m'))*cc*c.tcl + (_cnc_m_v*_coef('h_cnc_m'))*cc*c.tm;
+  const mo_a=(h_collage*_coef('h_collage')+_deli_mo_v*_coef('h_deli_mo')+_chant_mo_v*_coef('h_chant_mo')+_cnc_mo_v*_coef('h_cnc_mo')+_montage_v*_coef('h_montage')+_demont_v*_coef('h_demontage')+h_emballage*_coef('h_emballage'))*cc*c.ta;
+  // La pose ne doit être comptée qu'une seule fois : la ligne 'Pose' reprend déjà le total J160.
+  // La ligne 'Pose' reprend le total J160 / tableau d'heures du lot.
+  const mo_p=(_pose_v*_coef('h_pose'))*c.tp+h_transport*_coef('h_transport')*c.tt+h_fer*_coef('h_fer')*c.tf+h_go*_coef('h_go')*c.tg+(lot.h_finition||0)*_coef('h_finition')*c.ta;
+  const mo_total=mo_e+mo_prg+mo_m+mo_a+mo_p;
+
+  // Valeurs UNITAIRES (1 lot)
+  const mat_v1=mat_a*c.cm, quinc_v1=quinc_a*c.cq, stt_v1=stt_v_detail, mo_v1=mo_total*c.cmo;
+  const tot_a1=mat_a+quinc_a+stt_a+mo_total, tot_v1=mat_v1+quinc_v1+stt_v1+mo_v1;
+  const h_total1=(lot.h_offre||0)+h_mesures+_plan_v+_admin_v+_suivi_v+_suivi_prod_v+_prg_v+_deli_m_v+_chant_m_v+_cnc_m_v+h_collage+_deli_mo_v+_chant_mo_v+_cnc_mo_v+_montage_v+_demont_v+h_emballage+_pose_v+h_transport+h_fer+h_go+(lot.h_finition||0);
+
+  // Valeurs TOTALES (× qty)
+  const mat_v=mat_v1*qty, quinc_v=quinc_v1*qty, stt_v=stt_v1*qty, mo_v=mo_v1*qty;
+  const tot_a=tot_a1*qty, tot_v=tot_v1*qty;
+  const marge=tot_v>0?(tot_v-tot_a)/tot_v:0;
+  const h_total=h_total1*qty;
+
+  // Heures par groupe (total = ×qty)
+  const hg_cadre   = ((lot.h_offre||0)+h_mesures+_admin_v+_suivi_v+_suivi_prod_v)*qty;
+  const hg_etude   = (_plan_v+_prg_v)*qty;
+  const hg_machine = (_deli_m_v+_chant_m_v+_cnc_m_v)*qty;
+  const hg_atelier = (h_collage+_deli_mo_v+_chant_mo_v+_cnc_mo_v+_montage_v+_demont_v+h_emballage+(lot.h_finition||0)+h_fer)*qty;
+  const hg_pose    = (_pose_v+h_transport+h_go)*qty;
+  // Détail par poste (×qty)
+  const hd = {
+    offre: (lot.h_offre||0)*qty, mesures: h_mesures*qty, admin: _admin_v*qty, plan: _plan_v*qty, suivi: _suivi_v*qty, suivi_prod: _suivi_prod_v*qty,
+    prg: _prg_v*qty, collage: h_collage*qty,
+    deli_m: _deli_m_v*qty, deli_mo: _deli_mo_v*qty, chant_m: _chant_m_v*qty, chant_mo: _chant_mo_v*qty,
+    cnc_m: _cnc_m_v*qty, cnc_mo: _cnc_mo_v*qty,
+    montage: _montage_v*qty, demont: _demont_v*qty, emball: h_emballage*qty,
+    finition: (lot.h_finition||0)*qty, fer: h_fer*qty,
+    transport: h_transport*qty, pose: _pose_v*qty, go: h_go*qty,
+  };
+  return{mat_a,quinc_a,stt_a,mo_total,mat_v,quinc_v,stt_v,mo_v,tot_a,tot_v,marge,h_total,
+         mat_a1:mat_a,quinc_a1:quinc_a,stt_a1:stt_a,mo_total1:mo_total,
+         tot_a1,tot_v1,h_total1,qty,
+         h_mob_at,h_mob_po,hg_cadre,hg_etude,hg_machine,hg_atelier,hg_pose,hd};
+}
+
+const fE=v=>(v||0).toLocaleString('fr-BE',{maximumFractionDigits:0})+' €';
+const fH=v=>(v||0).toLocaleString('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1})+' h';
+const fP=v=>((v||0)*100).toLocaleString('fr-BE',{minimumFractionDigits:1,maximumFractionDigits:1})+' %';
+const fN=(v,d=2)=>(v||0).toLocaleString('fr-BE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const f3=v=>(parseFloat(v)||0).toFixed(3);
+
+// ─── Autocomplete helper ──────────────────────────────────────────────────────
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.ac-wrap'))
+    document.querySelectorAll('.ac-drop.open').forEach(d=>d.classList.remove('open'));
+});
+
+// Helper: render an autocomplete field inline (wired via requestAnimationFrame after HTML insert)
+function acField(id, val, list, onChange){
+  const safe=(val||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  // Schedule wiring after this render cycle
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(!el||el._acInit) return;
+    el._acInit=true;
+    let _drop=null,_selIdx=0,_hits=[];
+
+    function pos(){
+      if(!_drop) return;
+      const r=el.getBoundingClientRect();
+      _drop.style.left=r.left+'px';
+      _drop.style.top=(r.bottom+2)+'px';
+      _drop.style.width=Math.max(r.width,260)+'px';
+    }
+    function close(){if(_drop){_drop.remove();_drop=null;}}
+    function open(){
+      close();
+      const q=el.value, qL=q.toLowerCase();
+      _hits=qL?list.filter(x=>x.l.toLowerCase().includes(qL)):[...list];
+      const hasNew=q&&!_hits.find(x=>x.l.toLowerCase()===qL);
+      if(!_hits.length&&!hasNew) return;
+      _selIdx=0;
+      _drop=document.createElement('div');
+      _drop.className='ac-drop open';
+      document.body.appendChild(_drop);
+      pos();
+      draw(hasNew,q);
+    }
+    function draw(hasNew,q){
+      if(!_drop) return;
+      _drop.innerHTML='';
+      _hits.forEach((x,i)=>{
+        const d=document.createElement('div');
+        d.className='ac-item'+(i===_selIdx?' sel':'');
+        d.textContent=x.l+(x.p>0?' — '+x.p.toFixed(2)+' €':'');
+        d.onmousedown=e=>{e.preventDefault();pick(x);};
+        _drop.appendChild(d);
+      });
+      if(hasNew){
+        const d=document.createElement('div');
+        d.className='ac-item create';
+        d.textContent='+ Créer "'+q+'"';
+        d.onmousedown=e=>{e.preventDefault();pick({l:q,p:0,_new:true});};
+        _drop.appendChild(d);
+      }
+    }
+    function pick(x){
+      el.value=x.l;
+      close();
+      onChange(x.l, x._new?0:x.p);
+    }
+    el.addEventListener('input',()=>open());
+    el.addEventListener('focus',()=>open());
+    el.addEventListener('blur',()=>setTimeout(()=>{if(_drop&&!_drop.matches(':hover'))close();},150));
+    el.addEventListener('keydown',e=>{
+      if(!_drop) return;
+      const q=el.value,qL=q.toLowerCase();
+      const hasNew=q&&!_hits.find(x=>x.l.toLowerCase()===qL);
+      const total=_hits.length+(hasNew?1:0);
+      if(e.key==='ArrowDown'){e.preventDefault();_selIdx=Math.min(_selIdx+1,total-1);draw(hasNew,q);}
+      else if(e.key==='ArrowUp'){e.preventDefault();_selIdx=Math.max(_selIdx-1,0);draw(hasNew,q);}
+      else if(e.key==='Enter'){
+        e.preventDefault();
+        if(_selIdx<_hits.length) pick(_hits[_selIdx]);
+        else if(hasNew) pick({l:q,p:0,_new:true});
+      }
+      else if(e.key==='Escape') close();
+    });
+    window.addEventListener('scroll',pos,true);
+    document.addEventListener('mousedown',e=>{if(_drop&&!_drop.contains(e.target)&&e.target!==el)close();});
+  },0);
+  return`<input class="ac-inp" id="${id}" type="text" value="${safe}" placeholder="Rechercher ou créer…" autocomplete="off">`;
+}
+
+function renderList(){
+  const el=document.getElementById('lot-list');
+  if(!lots.length){el.innerHTML='<div style="color:var(--txt3);font-size:12px;font-style:italic">Aucun lot</div>';return}
+  el.innerHTML=lots.map((l,i)=>{const r=calcLot(l);return`<div class="lot-item${i===act?' active':''}" onclick="sel(${i})">
+    <span class="lot-name">${l.name}${l.dans_offre===false?'<span style="font-size:9px;background:#f0f0f0;color:#8a8780;border-radius:3px;padding:1px 4px;margin-left:4px">hors offre</span>':''}</span><span class="lot-v">${fE(r.tot_v)}</span>
+    <span class="badge ${l.type==='menuiserie'?'bm':'bs'}">${l.type==='menuiserie'?'MEN':'STT'}</span>
+  </div>`;}).join('');
+}
+
+function selOpt(list,val,byPrice=false){
+  return list.map(x=>{
+    const sel=byPrice?Math.abs(x.p-(val||0))<0.01:x.l===val;
+    return`<option value="${x.p}" data-l="${x.l}"${sel?' selected':''}>${x.l}</option>`;
+  }).join('');
+}
+
+function renderLot(){
+  const el=document.getElementById('lot-detail');
+  if(act===null||act>=lots.length){el.innerHTML='<div class="notice ni">Sélectionnez ou créez un lot dans la barre latérale.</div>';return}
+  const lot=lots[act],c=C(),r=calcLot(lot);
+  const _M=bdM(),_C=bdC(),_Q=bdQ();
+
+  // ── Bordereaux du lot ─────────────────────────────────────────────────────
+  const brds=getLotBordereaux(lot);
+  const hasBrds=brds.length>0;
+
+  // Calcul m² et chants ml depuis un bordereau par id + coeff chute
+  function brdM2ById(id,coeff){
+    const b=brds.find(x=>x.id===id);if(!b) return 0;
+    const t=brdTotaux(b);return parseFloat((t.m2*(coeff||1)).toFixed(3));
+  }
+  function brdChtById(id,coeff){
+    const b=brds.find(x=>x.id===id);if(!b) return 0;
+    const t=brdTotaux(b);return parseFloat((t.cht*(coeff||1)).toFixed(3));
+  }
+
+  // Select options bordereaux
+  function brdOpts(selId){
+    return`<option value=""${!selId?' selected':''}>— Saisie libre —</option>`
+      +brds.map(b=>`<option value="${b.id}"${b.id===selId?' selected':''}>${b.nom||'Sans nom'}</option>`).join('');
+  }
+
+  // Matériaux
+  const matRows=lot.mats.map((m,i)=>{
+    const pu=m.pu||0;
+    const brdId=m.brd_id||'';
+    const coeff=m.coeff_chute||1.3;
+    let qty;
+    if(brdId&&hasBrds){qty=brdM2ById(brdId,coeff);m.qty=qty;}
+    else qty=m.qty||0;
+    const fromBrd=brdId&&hasBrds;
+    const acId=`mat_${act}_${i}`;
+    const acCb=(lbl,prix)=>{lots[act].mats[i].desc=lbl;if(prix>0)lots[act].mats[i].pu=prix;ra();};
+    return`<tr>
+      <td style="min-width:190px">${acField(acId,m.desc||'',_M,acCb)}</td>
+      <td><input type="number" step=".01" value="${pu||''}" placeholder="0,00"
+        style="width:68px;text-align:right;color:${pu>0?'var(--acc)':'var(--txt3)'}"
+        oninput="lots[act].mats[${i}].pu=parseFloat(this.value)||0;raD()"></td>
+      <td style="min-width:220px">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <button style="font-size:11px;padding:2px 7px;border:1px solid ${fromBrd?'var(--acc)':'var(--bor)'};
+            border-radius:4px;background:${fromBrd?'var(--acc-l)':'var(--sur2)'};
+            color:${fromBrd?'var(--acc)':'var(--txt2)'};cursor:pointer;font-weight:600;white-space:nowrap"
+            onclick="openBordForTarget('mat',${i})"
+            title="Cliquer pour choisir ou créer un bordereau">
+            ${fromBrd?(chantierBordereaux.find(b=>b.id===brdId)?.ref||'Brd'):'📐 Bordereau'}
+          </button>
+          ${fromBrd?`
+            <span style="font-size:11px;color:var(--txt2)">× chute</span>
+            <input type="number" step=".001" min="1" value="${coeff}"
+              style="width:60px;font-size:12px;text-align:right;padding:3px 5px"
+              onchange="lots[act].mats[${i}].coeff_chute=parseFloat(this.value.replace(',','.'))||1;ra()" onblur="lots[act].mats[${i}].coeff_chute=parseFloat(this.value.replace(',','.'))||1;ra()">
+            <strong style="color:var(--acc);font-size:12px;padding:2px 6px;background:var(--acc-l);border-radius:3px"
+              title="m² calculés">${f3(qty)} m²</strong>
+            <button style="font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer"
+              onclick="lots[act].mats[${i}].brd_id='';ra()" title="Retirer bordereau">✕</button>
+          `:`
+            <input type="number" step=".001" value="${qty||''}" placeholder="0 m²"
+              style="width:80px;text-align:right"
+              oninput="lots[act].mats[${i}].qty=parseFloat(this.value)||0;raD()">
+          `}
+        </div>
+      </td>
+      <td class="r tbl">${pu>0&&qty?fE(pu*qty):'—'}</td>
+      <td><button class="btn btn-r btn-sm" onclick="lots[act].mats.splice(${i},1);ra()">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  // Chants
+  const chantRows=lot.chants.map((ch,i)=>{
+    const pu=ch.pu||0;
+    const brdId=ch.brd_id||'';
+    const coeffCht=ch.coeff_cht||1.0;
+    let qty;
+    if(brdId&&hasBrds){qty=brdChtById(brdId,coeffCht);ch.qty=qty;}
+    else qty=ch.qty||0;
+    const fromBrd=brdId&&hasBrds;
+    const acId=`cha_${act}_${i}`;
+    const acCb=(lbl,prix)=>{lots[act].chants[i].desc=lbl;if(prix>0)lots[act].chants[i].pu=prix;ra();};
+    return`<tr>
+      <td style="min-width:180px">${acField(acId,ch.desc||'',_C,acCb)}</td>
+      <td><input type="number" step=".01" value="${pu||''}" placeholder="0,00"
+        style="width:68px;text-align:right;color:${pu>0?'var(--acc)':'var(--txt3)'}"
+        oninput="lots[act].chants[${i}].pu=parseFloat(this.value)||0;raD()"></td>
+      <td style="min-width:220px">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <button style="font-size:11px;padding:2px 7px;border:1px solid ${fromBrd?'var(--acc)':'var(--bor)'};
+            border-radius:4px;background:${fromBrd?'var(--acc-l)':'var(--sur2)'};
+            color:${fromBrd?'var(--acc)':'var(--txt2)'};cursor:pointer;font-weight:600;white-space:nowrap"
+            onclick="openBordForTarget('chant',${i})"
+            title="Cliquer pour choisir ou créer un bordereau">
+            ${fromBrd?(chantierBordereaux.find(b=>b.id===brdId)?.ref||'Brd'):'📐 Bordereau'}
+          </button>
+          ${fromBrd?`
+            <span style="font-size:11px;color:var(--txt2)">× coeff</span>
+            <input type="number" step=".001" min="0" value="${coeffCht}"
+              style="width:60px;font-size:12px;text-align:right;padding:3px 5px"
+              onchange="lots[act].chants[${i}].coeff_cht=parseFloat(this.value.replace(',','.'))||1;ra()" onblur="lots[act].chants[${i}].coeff_cht=parseFloat(this.value.replace(',','.'))||1;ra()">
+            <strong style="color:var(--acc);font-size:12px;padding:2px 6px;background:var(--acc-l);border-radius:3px"
+              title="ml calculés">${f3(qty)} ml</strong>
+            <button style="font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer"
+              onclick="lots[act].chants[${i}].brd_id='';ra()" title="Retirer bordereau">✕</button>
+          `:`
+            <input type="number" step=".001" value="${qty||''}" placeholder="0 ml"
+              style="width:80px;text-align:right"
+              oninput="lots[act].chants[${i}].qty=parseFloat(this.value)||0;raD()">
+          `}
+        </div>
+      </td>
+      <td class="r tbl">${pu>0&&qty?fE(pu*qty):'—'}</td>
+      <td><button class="btn btn-r btn-sm" onclick="lots[act].chants.splice(${i},1);ra()">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  // Quinc — 7 colonnes : Article | Prix€ | Pc/unité | Nb/unité | Coef | Qté totale | Total€
+  const quincRows=lot.quinc.map((q,i)=>{
+    const pu=q.pu||0;
+    const pc_u=q.pc_u||1;
+    const nb_u=q.nb_u||1;
+    const coef=coefValue(q.coef,1);
+    const qty=parseFloat((pc_u*nb_u*coef).toFixed(3));
+    const total=pu*qty;
+    const isLast=(i===lot.quinc.length-1);
+    const acId=`qui_${act}_${i}`;
+    const acCb=(lbl,prix)=>{lots[act].quinc[i].desc=lbl;if(prix>0)lots[act].quinc[i].pu=prix;ra();};
+    // Enter sur dernière ligne → ajouter nouvelle ligne
+    const onEnterLast=isLast?`onkeydown="if(event.key==='Enter'){event.preventDefault();lots[act].quinc.push({desc:'',pu:0,pc_u:1,nb_u:1,coef:1});ra();setTimeout(()=>{const rows=document.querySelectorAll('#quinc-tbody tr');if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp)inp.focus();}},50)}"`:'' ;
+    return`<tr>
+      <td style="min-width:180px">${acField(acId, q.desc||'', _Q, acCb)}</td>
+      <td><input type="number" step=".01" value="${pu||''}" placeholder="0,00"
+        style="width:80px;text-align:right;color:${pu>0?'var(--acc)':'var(--txt3)'}"
+        oninput="lots[act].quinc[${i}].pu=parseFloat(this.value)||0;raD()"></td>
+      <td><input type="number" step="1" min="0" value="${q.pc_u||''}" placeholder="1"
+        style="width:64px;text-align:right" title="Pc / unité"
+        oninput="lots[act].quinc[${i}].pc_u=parseFloat(this.value)||1;raD()"></td>
+      <td><input type="number" step="1" min="0" value="${q.nb_u||''}" placeholder="1"
+        style="width:64px;text-align:right" title="Nombre d'unités"
+        oninput="lots[act].quinc[${i}].nb_u=parseFloat(this.value)||1;raD()"></td>
+      <td><input type="number" step=".01" min="0" value="${q.coef||''}" placeholder="1"
+        style="width:60px;text-align:right" title="Coefficient"
+        ${onEnterLast}
+        oninput="setObjCoef(lots[act].quinc[${i}], 'coef', this.value, 1);raD()"></td>
+      <td class="r" style="font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:${qty>0?'var(--acc)':'var(--txt3)'}">
+        ${qty>0?qty:'—'}</td>
+      <td class="r tbl">${pu>0&&qty?fE(total):'—'}</td>
+      <td><button class="btn btn-r btn-sm" onclick="lots[act].quinc.splice(${i},1);ra()">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  // STT
+  const sttRows=lot.stt.map((s,i)=>{
+    const rs = calcSttRow(s, c.cs);
+    const mismatchStyle = rs.mismatch ? 'border-color:var(--warn);background:#fff8e0;' : '';
+    return `<tr>
+      <td style="min-width:180px"><input type="text" value="${s.desc||''}" placeholder="Prestataire" style="width:100%;font-size:12px" oninput="lots[act].stt[${i}].desc=this.value"></td>
+      <td><input type="number" step=".01" value="${rs.pu||''}" placeholder="0,00" style="width:80px;text-align:right" oninput="lots[act].stt[${i}].pu=parseFloat(this.value)||0;raD()"></td>
+      <td><input type="number" step=".01" value="${rs.qty_l||''}" placeholder="0" style="width:64px;text-align:right" oninput="lots[act].stt[${i}].qty_l=parseFloat(this.value)||0;raD()"></td>
+      <td><input type="number" step=".01" value="${rs.nb_p||''}" placeholder="0" style="width:64px;text-align:right" oninput="lots[act].stt[${i}].nb_p=parseFloat(this.value)||0;raD()"></td>
+      <td class="r" style="font-variant-numeric:tabular-nums">${rs.total?fN(rs.total,2):'—'}</td>
+      <td><input type="number" step=".01" value="${rs.mt||''}" placeholder="0,00" title="${rs.mismatch?'Montant différent de Prix unit × Total':''}" style="width:90px;text-align:right;${mismatchStyle}" oninput="lots[act].stt[${i}].mt=parseFloat(this.value)||0;raD()"></td>
+      <td><input type="number" step=".01" value="${rs.marge||''}" placeholder="${c.cs}" style="width:54px;text-align:right" oninput="lots[act].stt[${i}].marge=parseFloat(this.value)||0;raD()">${(parseFloat(s.marge)||0)>0?`<button type="button" title="Réinitialiser : suivre la marge générale sous-traitance (${c.cs})" style="margin-left:2px;border:1px solid #c8c4b8;background:#fff;border-radius:3px;font-size:11px;line-height:1;padding:1px 5px;cursor:pointer;color:#58554e;vertical-align:middle" onclick="lots[act].stt[${i}].marge=0;ra()">↺</button>`:''}</td>
+      <td class="r tbl">${rs.vente?fE(rs.vente):'—'}</td>
+      <td><button class="btn btn-r btn-sm" onclick="lots[act].stt.splice(${i},1);ra()">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  // ── Calculs automatiques depuis le tableau mobilier ──────────────────────
+  const _mobR=(lot.mobRows&&lot.mobRows.length)?lot.mobRows:[];
+  let _h_at=0,_h_po=0;
+  if(_mobR.length){
+    _mobR.forEach(row=>{
+      if((row.type||'row')!=='row') return;
+      const qty=parseFloat(row.qty ?? row.qte ?? 0)||0;
+      const hAt=parseFloat(row.h_at ?? row.hat ?? row.heures_at ?? 0)||0;
+      const hPo=parseFloat(row.h_po ?? row.hpo ?? row.heures_po ?? 0)||0;
+      row.qty=qty; row.h_at=hAt; row.h_po=hPo;
+      _h_at += qty*hAt;
+      _h_po += qty*hPo;
+    });
+  } else {
+    const mh=getMobH(lot);
+    _h_at = mh.h_mob_at;
+    _h_po = mh.h_mob_po;
+  }
+
+  // Totaux des bordereaux du lot (logique Excel MAT 1 / MAT 2 / MAT 3)
+  const _mbs=getLotBordStats(lot);
+  const _mat_ml=parseFloat(f3(_mbs.ml||0));
+  const _mat_cht=parseFloat(f3(_mbs.cht||0));
+  const _mat_pcs=parseFloat(f3(_mbs.pcs||0));
+
+  // Formules automatiques — alignées sur l'Excel
+  const ac = AC(lot);
+  const h_collage   = lot.h_collage   || 0;
+  const h_mesures   = lot.h_mesures   || 0;
+  const h_emballage = lot.h_emballage || 0;
+  const h_transport = lot.h_transport || 0;
+  const h_fer       = lot.h_fer       || 0;
+  const h_go        = lot.h_go        || 0;
+
+  const raw_deli_mo   = parseFloat(f3((_mat_ml/(ac.deli_mlph||330))*(ac.deli_factor||6)));
+  const raw_chant_mo  = parseFloat(f3((_mat_cht/(ac.chant_mlph||195))*(ac.chant_factor||7.4)));
+  const raw_cnc_mo    = parseFloat(f3((_mat_pcs/(ac.cnc_div||12))));
+  const raw_montage   = parseFloat(f3(_h_at));
+  const raw_pose      = parseFloat(f3(_h_po));
+  const raw_deli_m    = parseFloat(f3(raw_deli_mo*(ac.deli_machine_mult||0.8)));
+  const raw_chant_m   = parseFloat(f3(raw_chant_mo*(ac.chant_machine_mult||0.8)));
+  const raw_cnc_m     = parseFloat(f3(raw_cnc_mo*(ac.cnc_machine_mult||0.8)));
+
+  function _v(fld, autoVal){
+    return lot[fld+'_override']===true ? (lot[fld]||0) : autoVal;
+  }
+  function _syncAuto(fld, autoVal){
+    if(!lot[fld+'_override']) lot[fld]=autoVal;
+    return _v(fld, autoVal);
+  }
+
+  const _deli_mo_v   = _syncAuto('h_deli_mo', raw_deli_mo);
+  const _chant_mo_v  = _syncAuto('h_chant_mo', raw_chant_mo);
+  const _cnc_mo_v    = _syncAuto('h_cnc_mo', raw_cnc_mo);
+  const _montage_v   = _syncAuto('h_montage', raw_montage);
+  const raw_demontage = parseFloat(f3(_montage_v/(ac.demont_div||6)));
+  const _demont_v    = _syncAuto('h_demontage', raw_demontage);
+  const _pose_v      = _syncAuto('h_pose', raw_pose);
+  const _deli_m_v    = _syncAuto('h_deli_m', raw_deli_m);
+  const _chant_m_v   = _syncAuto('h_chant_m', raw_chant_m);
+  const _cnc_m_v     = _syncAuto('h_cnc_m', raw_cnc_m);
+
+  const raw_prg = parseFloat(f3(_cnc_mo_v/(ac.prg_div||2)));
+  const _prg_v = _syncAuto('h_prg', raw_prg);
+
+  const raw_suivi_prod = parseFloat(f3(
+    (_deli_m_v + _chant_m_v + _chant_mo_v + _cnc_mo_v +
+     _montage_v + _demont_v + h_emballage + h_transport + h_fer + h_go) * (ac.suivi_prod_pct||0.10)
+  ));
+  const _suivi_prod_v = _syncAuto('h_suivi_p', raw_suivi_prod);
+
+  const base_gestion = parseFloat(f3(
+    h_collage + _deli_mo_v + _chant_mo_v + _cnc_mo_v +
+    _montage_v + _demont_v + h_emballage + h_transport + _pose_v + h_fer + h_go
+  ));
+
+  const raw_plan = parseFloat(f3(( _suivi_prod_v + _prg_v + base_gestion ) * (ac.plan_pct||0.35)));
+  const _plan_v = _syncAuto('h_etude', raw_plan);
+
+  const rowVente = (hv, coef, taux) => (parseFloat(hv)||0) * coefValue(coef,1) * (parseFloat(taux)||0) * coefValue(c.cmo,1);
+  const raw_admin = parseFloat(f3((
+      r.mat_v + r.quinc_v + r.stt_v +
+      rowVente((lot.h_offre||0), coefValue(lot.h_offre_coef,1), c.tof) +
+      rowVente(h_mesures, coefValue(lot.h_mesures_coef,1), c.tof) +
+      rowVente(_plan_v, coefValue(lot.h_etude_coef,1), c.tet) +
+      rowVente(_suivi_prod_v, coefValue(lot.h_suivi_p_coef,1), c.ta) +
+      rowVente(_prg_v, coefValue(lot.h_prg_coef,1), c.ta) +
+      rowVente(h_collage, coefValue(lot.h_collage_coef,1), c.cc*c.ta) +
+      rowVente(_deli_m_v, coefValue(lot.h_deli_m_coef,1), c.cc*c.tdl) +
+      rowVente(_deli_mo_v, coefValue(lot.h_deli_mo_coef,1), c.cc*c.ta) +
+      rowVente(_chant_m_v, coefValue(lot.h_chant_m_coef,1), c.cc*c.tcl) +
+      rowVente(_chant_mo_v, coefValue(lot.h_chant_mo_coef,1), c.cc*c.ta) +
+      rowVente(_cnc_m_v, coefValue(lot.h_cnc_m_coef,1), c.cc*c.tm) +
+      rowVente(_cnc_mo_v, coefValue(lot.h_cnc_mo_coef,1), c.cc*c.ta) +
+      rowVente(_montage_v, coefValue(lot.h_montage_coef,1), c.cc*c.ta) +
+      rowVente(_demont_v, coefValue(lot.h_demontage_coef,1), c.cc*c.ta) +
+      rowVente(h_emballage, coefValue(lot.h_emballage_coef,1), c.cc*c.ta) +
+      rowVente(h_transport, coefValue(lot.h_transport_coef,1), c.tt) +
+      rowVente(_pose_v, coefValue(lot.h_pose_coef,1), c.tp) +
+      rowVente(h_fer, coefValue(lot.h_fer_coef,1), c.tf) +
+      rowVente(h_go, coefValue(lot.h_go_coef,1), c.tg)
+    )/(ac.admin_div||3600)
+  ));
+  const _admin_v = _syncAuto('h_admin', raw_admin);
+
+  const raw_suivi = parseFloat(f3(base_gestion * (ac.suivi_pct||0.17)));
+  const _suivi_v = _syncAuto('h_suivi', raw_suivi);
+
+  lot.h_pose_mob = _pose_v;
+  lot.h_cnc_m_auto= _cnc_m_v;
+  lot._auto_plan  = raw_plan;
+  lot._auto_admin = raw_admin;
+  lot._auto_suivi = raw_suivi;
+  lot._auto_suivi_prod = raw_suivi_prod;
+  lot._auto_prg   = raw_prg;
+
+  // Helper ligne MO avec colonne Coef
+  window.editLineCoef = function(fld, lbl){
+    const coefFld = fld + '_coef';
+    const cur = coefValue(lots[act]?.[coefFld],1);
+    const raw = prompt('Coefficient pour la ligne « ' + lbl + ' » (0 autorisé)', String(cur).replace('.',','));
+    if(raw===null) return;
+    const n = parseFloat(String(raw).replace(',','.'));
+    if(!isNaN(n) && n>=0){
+      lots[act][coefFld] = n;
+      raD();
+    }
+  }
+
+  function hasAutoParamEditor(fld){
+    return ['h_etude','h_admin','h_suivi','h_suivi_p','h_prg','h_deli_m','h_deli_mo','h_chant_m','h_chant_mo','h_cnc_m','h_cnc_mo','h_demontage'].includes(fld);
+  }
+
+  window.editAutoParamsForLine = function(fld, lbl){
+    if(act===null || act>=lots.length) return;
+    const lot = lots[act];
+    if(!lot.auto_cfg || typeof lot.auto_cfg !== 'object') lot.auto_cfg = {};
+    const cfg = lot.auto_cfg;
+    const editOne = (key, label) => {
+      const globalVal = coefValue(AUTO_CFG[key], AUTO_CFG_DEFAULTS[key]);
+      const curVal = (cfg[key]===undefined || cfg[key]===null || cfg[key]==='') ? globalVal : coefValue(cfg[key], globalVal);
+      const raw = prompt('Paramètre automatique — ' + lbl + '\n' + label + '\n(Vide = valeur globale ' + String(globalVal).replace('.',',') + ')', String(curVal).replace('.',','));
+      if(raw===null) return false;
+      const txt = String(raw).trim();
+      if(txt===''){ delete cfg[key]; return true; }
+      const n = parseFloat(txt.replace(',','.'));
+      if(!Number.isFinite(n) || n < 0){ alert('Valeur invalide'); return false; }
+      cfg[key] = n;
+      return true;
+    };
+
+    let ok = true;
+    switch(fld){
+      case 'h_etude': ok = editOne('plan_pct', 'Plan (%)'); break;
+      case 'h_admin': ok = editOne('admin_div', 'Administratif (diviseur)'); break;
+      case 'h_suivi': ok = editOne('suivi_pct', 'Suivi gestionnaire (%)'); break;
+      case 'h_suivi_p': ok = editOne('suivi_prod_pct', 'Suivi production (%)'); break;
+      case 'h_prg': ok = editOne('prg_div', 'Programmation (diviseur)'); break;
+      case 'h_deli_m': ok = editOne('deli_machine_mult', 'Déligneuse machine (multiplicateur)'); break;
+      case 'h_deli_mo': ok = editOne('deli_mlph', 'Déligneuse ml/h') && editOne('deli_factor', 'Déligneuse facteur'); break;
+      case 'h_chant_m': ok = editOne('chant_machine_mult', 'Colleuse machine (multiplicateur)'); break;
+      case 'h_chant_mo': ok = editOne('chant_mlph', 'Colleuse chants ml/h') && editOne('chant_factor', 'Colleuse facteur'); break;
+      case 'h_cnc_m': ok = editOne('cnc_machine_mult', 'Numérique machine (multiplicateur)'); break;
+      case 'h_cnc_mo': ok = editOne('cnc_div', 'Numérique (pièces / h)'); break;
+      case 'h_demontage': ok = editOne('demont_div', 'Démontage (diviseur)'); break;
+      default:
+        alert("Cette ligne n'a pas de paramètre automatique éditable ici.");
+        ok = false;
+    }
+    if(ok) raD();
+  }
+
+
+window.recalcAutoRemaining = function(){
+    if(act===null || act>=lots.length) return;
+    const autoFields = ['h_etude','h_admin','h_suivi','h_suivi_p','h_prg','h_deli_m','h_deli_mo','h_chant_m','h_chant_mo','h_cnc_m','h_cnc_mo','h_montage','h_demontage','h_pose'];
+    autoFields.forEach(fld=>{
+      if(!lots[act][fld+'_override']) delete lots[act][fld];
+    });
+    ra();
+  }
+
+  function moRow(lbl, fld, taux, autoVal, isAuto, tooltip=''){
+    let hv, isOverridden=false;
+    if(isAuto){
+      isOverridden = lot[fld+'_override']===true;
+      hv = isOverridden ? (lot[fld]||0) : autoVal;
+      if(!isOverridden) lot[fld]=autoVal;
+    } else {
+      hv = lot[fld]||0;
+    }
+    const coefFld = fld+'_coef';
+    const coefVal = coefValue(lot[coefFld],1);
+    const montant = hv * coefVal * taux;
+    const bg = isAuto ? (isOverridden?'background:#fff8e0;':'background:#e8f0fb;') : '';
+    const badge = isAuto
+      ? (isOverridden
+          ? `<span style="font-size:9px;background:#b85c0a;color:#fff;border-radius:3px;padding:1px 4px;margin-left:4px" title="Valeur manuelle — cliquez ↺ pour recalculer">MAN</span>`
+          : `<span style="font-size:9px;background:#1a4a8a;color:#fff;border-radius:3px;padding:1px 4px;margin-left:4px" title="${tooltip||'Calculé automatiquement'}">AUTO</span>`)
+      : '';
+    const resetBtn = isAuto && isOverridden
+      ? `<button style="border:none;background:none;cursor:pointer;color:#1a4a8a;font-size:13px;padding:0 3px;line-height:1"
+           title="Réinitialiser à la valeur calculée (${(+autoVal.toFixed(2))} h)"
+           onclick="lots[act]['${fld}_override']=false;lots[act]['${fld}']=${autoVal};raD()">↺</button>`
+      : '';
+    const hvStr = (hv||0).toFixed(2);
+    const inp = isAuto
+      ? `<div style="display:flex;align-items:center;gap:2px">
+           <input type="number" min="0" step=".01" value="${hvStr}" placeholder="0"
+             style="width:90px;text-align:right;${isOverridden?'border-color:#b85c0a;':''}"
+             oninput="lots[act]['${fld}']=parseFloat(this.value)||0;lots[act]['${fld}_override']=true;raD()">
+           ${resetBtn}
+         </div>`
+      : `<input type="number" min="0" step=".01" value="${(hv||'')}" placeholder="0"
+           style="width:90px;text-align:right"
+           oninput="lots[act]['${fld}']=parseFloat(this.value)||0;raD()">`;
+    const gearBtn = (isAuto && hasAutoParamEditor(fld))
+      ? `<button type="button" onclick="event.stopPropagation();editAutoParamsForLine('${fld}','${lbl.replace(/'/g,"&#39;")}')" title="Modifier les paramètres du calcul automatique" style="margin-left:6px;border:1px solid #c8c4b8;background:#fff;border-radius:3px;font-size:11px;line-height:1;padding:1px 5px;cursor:pointer;color:#58554e">⚙</button>`
+      : '';
+    return`<tr style="${bg}" ondblclick="if(!['INPUT','BUTTON','SELECT','TEXTAREA'].includes(event.target.tagName)){editLineCoef('${fld}','${lbl.replace(/'/g,"&#39;")}')}" title="Double-cliquez la ligne pour ajuster le coefficient">
+      <td style="font-size:12px;cursor:pointer" title="Double-cliquez la ligne pour ajuster le coefficient">${lbl}${badge}${gearBtn}</td>
+      <td>${inp}</td>
+      <td><input type="number" min="0" step=".01" value="${coefVal!=1?coefVal:''}" placeholder="1"
+        style="width:72px;text-align:right;${coefVal!=1?'border-color:var(--warn);background:#fff8e0;':''}"
+        title="Coefficient multiplicateur"
+        oninput="setObjCoef(lots[act],'${coefFld}',this.value,1);raD()"></td>
+      <td class="r" style="font-size:11px;color:var(--txt3)">${fN(taux)} €/h</td>
+      <td class="r ${montant>0?'acc':''}">${montant>0?fE(montant):'—'}</td>
+    </tr>`;
+  }
+
+  const moRows=[
+    moRow('Offre',                    'h_offre',    c.tof,      0,              false),
+    moRow('Prise de mesures',         'h_mesures',  c.tof,      0,              false),
+    moRow('Plan',                     'h_etude',    c.tet,      raw_plan,       true,  `= (Suivi prod + Prg + base gestion) × ${fN(ac.plan_pct,2)}`),
+    moRow('Administratif',            'h_admin',    c.tet,      raw_admin,      true,  `= (ventes matériaux + quincaillerie + STT + ventes MO hors administratif et suivi) / ${fN(ac.admin_div,0)}`),
+    moRow('Suivi gestionnaire',       'h_suivi',    c.tet,      raw_suivi,      true,  `= base gestion × ${fN(ac.suivi_pct,2)}`),
+    moRow('Suivi production',         'h_suivi_p',  c.ta,       raw_suivi_prod, true,  `= base production × ${fN(ac.suivi_prod_pct,2)}`),
+    moRow('Programmation',            'h_prg',      c.ta,       raw_prg,        true,  `= H/MO numérique / ${fN(ac.prg_div,2)}`),
+    moRow('Collage spécial',          'h_collage',  c.cc*c.ta,  0,              false),
+    moRow('Déligneuse 330ml/h',       'h_deli_m',   c.cc*c.tdl, raw_deli_m,     true,  `= H/MO déligneuse × ${fN(ac.deli_machine_mult,2)}`),
+    moRow('H / Mo Déligneuse',        'h_deli_mo',  c.cc*c.ta,  raw_deli_mo,    true,  `= (ml périmètre ${fN(_mat_ml,1)} / ${fN(ac.deli_mlph,0)}) × ${fN(ac.deli_factor,2)}`),
+    moRow('Colleuse de chant 390ml/h','h_chant_m',  c.cc*c.tcl, raw_chant_m,    true,  `= H/MO colleuse × ${fN(ac.chant_machine_mult,2)}`),
+    moRow('H / MO colleuse de chant', 'h_chant_mo', c.cc*c.ta,  raw_chant_mo,   true,  `= (ml chants ${fN(_mat_cht,1)} / ${fN(ac.chant_mlph,0)}) × ${fN(ac.chant_factor,2)}`),
+    moRow('Numérique 480ml/h',        'h_cnc_m',    c.cc*c.tm,  raw_cnc_m,      true,  `= H/MO numérique × ${fN(ac.cnc_machine_mult,2)}`),
+    moRow('H / Mo numérique',         'h_cnc_mo',   c.cc*c.ta,  raw_cnc_mo,     true,  `= ${fN(_mat_pcs,0)} pièces / ${fN(ac.cnc_div,0)}`),
+    moRow('Montage',                  'h_montage',  c.cc*c.ta,  raw_montage,    true,  '= total heures atelier du tableau mobilier'),
+    moRow('Démontage',                'h_demontage',c.cc*c.ta,  raw_demontage,  true,  `= Montage / ${fN(ac.demont_div,2)}`),
+    moRow('Emballage (×cc)',          'h_emballage',c.cc*c.ta,  0,              false),
+    moRow('Transport',                'h_transport',c.tt,       0,              false),
+    moRow('Pose',                     'h_pose',     c.tp,       raw_pose,       true,  '= total heures pose du tableau mobilier'),
+    moRow('Fers',                     'h_fer',       c.tf,       0,              false),
+    moRow('Gros œuvre',              'h_go',        c.tg,       0,              false),
+    moRow('Finition',                 'h_finition',  c.ta,       0,              false),
+  ].join('');
+
+  const h_mob_at=r.h_mob_at||0, h_mob_po=r.h_mob_po||0;
+
+  el.innerHTML=`
+  <div class="lot-sticky">
+    <div class="lot-hd">
+      <input class="lot-name-inp" value="${lot.name}" oninput="lots[act].name=this.value;renderList()">
+      <select style="width:120px" onchange="lots[act].type=this.value;ra()">
+        <option value="menuiserie"${lot.type==='menuiserie'?' selected':''}>Menuiserie</option>
+        <option value="stt"${lot.type==='stt'?' selected':''}>Sous-traitant</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap">
+        <span style="color:var(--txt2)">Quantité</span>
+        <input type="number" min="1" step="1" value="${lot.qty||1}"
+          style="width:56px;text-align:center;font-weight:600;color:var(--acc)"
+          title="Nombre de fois ce lot est réalisé"
+          oninput="lots[act].qty=parseInt(this.value)||1;ra()">
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;padding:5px 8px;border:1px solid ${lot.dans_offre!==false?'#9ecfb0':'#c8c4b8'};border-radius:4px;background:${lot.dans_offre!==false?'#e6f0ea':'#f8f6f1'};white-space:nowrap" title="Inclure ce lot dans l'offre client">
+        <input type="checkbox" ${lot.dans_offre!==false?'checked':''} onchange="lots[act].dans_offre=this.checked;renderList();ra()">
+        Dans l'offre
+      </label>
+      <button class="btn btn-sm" onclick="dupLot(${act})" title="Créer une copie de ce lot">⧉ Dupliquer</button>
+      <button class="btn btn-r btn-sm" onclick="delLot(${act})">Supprimer</button>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="lb">Coût achat ${r.qty>1?'(unit.)':''}</div><div class="v">${fE(r.tot_a1)}</div>${r.qty>1?`<div class="sb">× ${r.qty} = ${fE(r.tot_a)}</div>`:''}</div>
+      <div class="kpi hl"><div class="lb">Prix vente HT ${r.qty>1?'(unit.)':''}</div><div class="v">${fE(r.tot_v1)}</div>${r.qty>1?`<div class="sb">× ${r.qty} = ${fE(r.tot_v)}</div>`:''}</div>
+      <div class="kpi"><div class="lb">Marge brute</div><div class="v">${fP(r.marge)}</div><div class="sb">${fE(r.tot_v-r.tot_a)}</div></div>
+      <div class="kpi"><div class="lb">Heures ${r.qty>1?'(unit.)':''}</div><div class="v">${fH(r.h_total1)}</div>${r.qty>1?`<div class="sb">× ${r.qty} = ${fH(r.h_total)}</div>`:`<div class="sb">${fN(r.h_total/8,1)} j</div>`}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <h3>Matériaux panneau</h3>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="card-tt">Achat ${fE(r.mat_a)} → Vente ${fE(r.mat_a*gv('cm'))}</span>
+        <button class="btn btn-sm" onclick="openBord()"
+          style="background:${hasBrds?'#2a5438':'#fff8e0'};color:${hasBrds?'#fff':'#5a4000'};border-color:${hasBrds?'#2a5438':'#e8d080'};font-weight:500">
+          📐 ${hasBrds?`Bordereaux (${brds.length})`:'+ Créer bordereau'}
+        </button>
+        ${hasBrds?`<span style="font-size:11px;color:var(--txt3)">${brds.map(b=>{const t=brdTotaux(b);return`<strong>${b.ref||b.nom}</strong>: ${f3(t.m2)}m²`;}).join(' · ')}</span>`:''}
+      </div>
+    </div>
+    <div class="card-bd" style="padding:8px 12px">
+      ${!hasBrds?`<div style="font-size:12px;color:#5a4000;background:#fff8e0;border:1px solid #e8d080;border-radius:4px;padding:7px 11px;margin-bottom:8px">
+        📐 Cliquez <strong>"+ Créer bordereau"</strong> pour saisir les dimensions des pièces et calculer automatiquement les m² et ml de chants.
+      </div>`:''}
+      <table class="tbl"><thead><tr><th>Matériau</th><th style="width:72px">€/m²</th><th>Qté m²</th><th style="width:80px" class="r">Total achat</th><th style="width:32px"></th></tr></thead>
+      <tbody>${matRows}</tbody></table>
+      <div class="add-row"><button class="btn btn-sm" onclick="lots[act].mats.push({desc:'',pu:0,qty:0,brd_id:'',coeff_chute:1.3});ra()">+ Matériau</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>Chants</h3></div>
+    <div class="card-bd" style="padding:8px 12px">
+      <table class="tbl"><thead><tr><th>Type de chant</th><th style="width:72px">€/ml</th><th>Qté ml</th><th style="width:80px" class="r">Total</th><th style="width:32px"></th></tr></thead>
+      <tbody>${chantRows}</tbody></table>
+      <div class="add-row"><button class="btn btn-sm" onclick="lots[act].chants.push({desc:'',pu:0,qty:0,brd_id:'',coeff_cht:1.0});ra()">+ Chant</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>Quincaillerie</h3><span class="card-tt">Achat ${fE(r.quinc_a)} → Vente ${fE(r.quinc_v)}</span></div>
+    <div class="card-bd" style="padding:8px 12px;overflow-x:auto">
+      <table class="tbl" style="min-width:680px"><thead><tr>
+        <th>Article</th>
+        <th style="width:68px;text-align:right">Prix €</th>
+        <th style="width:52px;text-align:right" title="Pièces par unité">Pc/u</th>
+        <th style="width:52px;text-align:right" title="Nombre d'unités">Nb/u</th>
+        <th style="width:50px;text-align:right" title="Coefficient multiplicateur">Coef</th>
+        <th style="width:60px;text-align:right" title="Pc/u × Nb/u × Coef">Qté tot.</th>
+        <th style="width:80px" class="r">Total achat</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody id="quinc-tbody">${quincRows}</tbody></table>
+      <div class="add-row"><button class="btn btn-sm" onclick="lots[act].quinc.push({desc:'',pu:0,pc_u:1,nb_u:1,coef:1});ra()">+ Article</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>Sous-traitants</h3><span class="card-tt">Achat ${fE(r.stt_a)} → Vente ${fE(r.stt_v)}</span></div>
+    <div class="card-bd" style="padding:8px 12px;overflow-x:auto">
+      <table class="tbl" style="min-width:860px"><thead><tr>
+        <th>Prestataire</th>
+        <th style="width:80px;text-align:right">Prix unit</th>
+        <th style="width:60px;text-align:right">Qté (L)</th>
+        <th style="width:60px;text-align:right">Nbre P</th>
+        <th style="width:70px;text-align:right">Total</th>
+        <th style="width:90px;text-align:right">Montant</th>
+        <th style="width:60px;text-align:right">Marge</th>
+        <th style="width:90px" class="r">Prix vente</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody>${sttRows}</tbody></table>
+      <div class="add-row"><button class="btn btn-sm" onclick="lots[act].stt.push({desc:'',pu:0,qty_l:0,nb_p:0,total:0,mt:0,marge:0,vente:0});ra()">+ Sous-traitant</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <h3>Mobilier — Heures atelier &amp; pose</h3>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="card-tt">Atelier ${fH(h_mob_at)} · Pose ${fH(h_mob_po)}</span>
+        <button class="btn btn-sm ${h_mob_at||h_mob_po?'btn-p':''}" onclick="toggleMob()" id="btn-mob-toggle">
+          ${h_mob_at||h_mob_po ? '✎ Modifier' : '⊞ Saisir quantités'}
+        </button>
+        <a href="/mobilier" target="_blank" class="btn btn-sm" title="Gérer les modèles de temps">⊞ Modèles</a>
+        <a href="/bd-prix" target="_blank" class="btn btn-sm" title="Taux BD Prix">⚙ Taux</a>
+      </div>
+    </div>
+    <div class="card-bd" style="padding:6px 12px 10px;display:none" id="mob-detail-${act}">
+      <div class="mob-hd">
+        <span>Article</span>
+        <span style="text-align:right">Unité</span>
+        <span style="text-align:right">Min/u atelier</span>
+        <span style="text-align:right">Qté atelier</span>
+        <span style="text-align:right">H atelier</span>
+        <span style="text-align:right">Min/u pose</span>
+        <span style="text-align:right">Qté pose</span>
+        <span style="text-align:right">H pose</span>
+      </div>
+      ${(()=>{
+        if(lot.mobRows && lot.mobRows.length){
+          const totalAt=(lot.mobRows||[]).reduce((s,row)=>s+((parseFloat(row.qty)||0)*(parseFloat(row.h_at)||0)),0);
+          const totalPo=(lot.mobRows||[]).reduce((s,row)=>s+((parseFloat(row.qty)||0)*(parseFloat(row.h_po)||0)),0);
+          return `
+            <div style="margin-bottom:8px;font-size:11px;color:var(--txt3)">Heures importées pour ce lot : le modèle de temps n'est pas appliqué ici.</div>
+            <div class="mob-hd" style="grid-template-columns:1fr 52px 64px 64px 72px 64px 72px">
+              <span>Article</span>
+              <span style="text-align:right">Unité</span>
+              <span style="text-align:right">Qty</span>
+              <span style="text-align:right">H/u At.</span>
+              <span style="text-align:right">Atelier</span>
+              <span style="text-align:right">H/u Pose</span>
+              <span style="text-align:right">Pose</span>
+            </div>
+            ${(lot.mobRows||[]).map((r,i)=>{
+              if((r.type||'row')==='section'){
+                return `<div style="grid-column:1/-1;background:var(--sur2);padding:4px 6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);border-top:1px solid var(--bor);margin-top:4px">${r.label||''}</div>`;
+              }
+              const qty=parseFloat(r.qty)||0, hAt=parseFloat(r.h_at)||0, hPo=parseFloat(r.h_po)||0;
+              const tAt=qty*hAt, tPo=qty*hPo;
+              const active=qty||tAt||tPo;
+              return `<div class="mob-row${active?' mob-row-on':''}" style="grid-template-columns:1fr 52px 64px 64px 72px 64px 72px">
+                <span style="font-size:12px">${r.desc||r.label||''}</span>
+                <span class="mob-val" style="font-size:11px;color:var(--txt3)">${r.unit||''}</span>
+                <input type="number" min="0" step="${(r.unit||'pc')==='m²'?'.01':'1'}" value="${qty||''}" placeholder="0"
+                  oninput="if(!lots[act].mobRows)lots[act].mobRows=[];lots[act].mobRows[${i}].qty=parseFloat(this.value)||0;raD()">
+                <input type="number" min="0" step=".01" value="${hAt||''}" placeholder="0"
+                  oninput="if(!lots[act].mobRows)lots[act].mobRows=[];lots[act].mobRows[${i}].h_at=parseFloat(this.value)||0;raD()">
+                <span class="mob-val${tAt?' mob-val-acc':''}">${tAt>0?fH(tAt):'—'}</span>
+                <input type="number" min="0" step=".01" value="${hPo||''}" placeholder="0"
+                  oninput="if(!lots[act].mobRows)lots[act].mobRows=[];lots[act].mobRows[${i}].h_po=parseFloat(this.value)||0;raD()">
+                <span class="mob-val${tPo?' mob-val-acc':''}">${tPo>0?fH(tPo):'—'}</span>
+              </div>`;
+            }).join('')}
+            <div style="display:grid;grid-template-columns:1fr 52px 64px 64px 72px 64px 72px;gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid var(--bor)">
+              <span style="font-weight:600;color:var(--txt2)">Total montage</span><span></span><span></span><span></span>
+              <span class="mob-val mob-val-acc">${fH(totalAt)}</span><span></span>
+              <span class="mob-val mob-val-acc">${fH(totalPo)}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 52px 64px 64px 72px 64px 72px;gap:4px;padding-top:2px">
+              <span style="font-weight:600;color:var(--txt2)">Total démontage</span><span></span><span></span><span></span>
+              <span class="mob-val">${fH(totalAt/6)}</span><span></span><span></span>
+            </div>`;
+        }
+        const taux=getMobRowsForLot(lot);
+        ensureLotMobEntries(lot);
+        let rowIdx=0;
+        const modelOptions = _mobModelList.map(m=>`<option value="${m.id}"${String(m.id)===String(getLotMobModelId(lot))?' selected':''}>${m.nom}</option>`).join('');
+        return `
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="font-size:12px;color:var(--txt2)">Modèle</span>
+            <select style="padding:4px 8px;font-size:12px" onchange="changeLotMobModel(this.value)">${modelOptions}</select>
+            <span style="font-size:11px;color:var(--txt3)">Les quantités restent saisies manuellement pour ce lot.</span>
+          </div>
+          ${taux.map(r=>{
+            if(r.type==='sec'){
+              return `<div style="grid-column:1/-1;background:var(--sur2);padding:4px 6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);border-top:1px solid var(--bor);margin-top:4px">${r.label||''}</div>`;
+            }
+            const i=rowIdx++;
+            const _mobEntry=(lot.mob&&lot.mob[i])||{qty_at:0,qty_po:0};
+            const qty_at=_mobEntry.qty_at||0;
+            const qty_po=_mobEntry.qty_po||0;
+            const mat=parseFloat(r.mat)||0, mpo=parseFloat(r.mpo)||0;
+            const h_at=qty_at*mat/60, h_po=qty_po*mpo/60;
+            const active=qty_at||qty_po;
+            return `<div class="mob-row${active?' mob-row-on':''}">
+              <span style="font-size:12px">${r.desc||''}</span>
+              <span class="mob-val" style="font-size:11px;color:var(--txt3)">${r.unit||''}</span>
+              <span class="mob-val" style="color:var(--txt3);font-size:11px">${mat?mat+' min':'—'}</span>
+              <input type="number" min="0" step="${(r.unit||'pc')==='m²'?'.1':'1'}" value="${qty_at||''}" placeholder="0"
+                oninput="ensureLotMobEntries(lots[act]);lots[act].mob[${i}].qty_at=parseFloat(this.value)||0;raD()">
+              <span class="mob-val${h_at?' mob-val-acc':''}">${h_at>0?fH(h_at):'—'}</span>
+              <span class="mob-val" style="color:var(--txt3);font-size:11px">${mpo?mpo+' min':'—'}</span>
+              <input type="number" min="0" step="${(r.unit||'pc')==='m²'?'.1':'1'}" value="${qty_po||''}" placeholder="0"
+                oninput="ensureLotMobEntries(lots[act]);lots[act].mob[${i}].qty_po=parseFloat(this.value)||0;raD()">
+              <span class="mob-val${h_po?' mob-val-acc':''}">${h_po>0?fH(h_po):'—'}</span>
+            </div>`;
+          }).join('')}
+        `;
+      })()}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><h3>Main-d'œuvre complémentaire</h3><div style="display:flex;align-items:center;gap:8px"><span class="card-tt">MO achat ${fE(r.mo_total)} → ${fE(r.mo_v)}</span><button class="btn btn-sm" onclick="recalcAutoRemaining()" title="Recalculer les lignes encore en mode automatique">↺ Recalculer AUTO</button></div></div>
+    <div class="card-bd" style="padding:8px 12px">
+      <div style="font-size:11px;color:var(--blu);background:#e8f0fb;border-radius:4px;padding:5px 9px;margin-bottom:8px">
+        <strong>Lignes AUTO (bleues)</strong> calculées depuis les bordereaux et le tableau mobilier ·
+        Délign. MAT : <strong>${fN(_mat_ml,1)} ml</strong> ·
+        Chants MAT : <strong>${fN(_mat_cht,1)} ml</strong> ·
+        Pièces MAT : <strong>${fN(_mat_pcs,0)}</strong> ·
+        Atelier mob. : <strong>${fH(h_mob_at)}</strong> ·
+        Pose mob. : <strong>${fH(h_mob_po)}</strong>
+      </div>
+      <table class="tbl"><thead><tr><th>Poste</th><th style="width:80px">Heures</th><th style="width:58px;text-align:right" title="Coefficient multiplicateur">Coef</th><th style="width:80px;text-align:right">Taux €/h</th><th style="width:80px" class="r">Achat</th></tr></thead>
+      <tbody>${moRows}</tbody>
+      <tfoot><tr><td colspan="3">Total MO achat</td><td class="r acc">${fE(r.mo_total)}</td></tr></tfoot>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderRes(){
+  const el=document.getElementById('resume');
+  if(!lots.length){el.innerHTML='<div class="notice ni">Aucun lot créé.</div>';return}
+  let ta=0,tv=0,th=0,ma_m=0,mv_m=0,ma_q=0,mv_q=0,ma_s=0,mv_s=0,ma_mo=0,mv_mo=0;
+  // Totaux heures par groupe
+  let hg={cadre:0,etude:0,machine:0,atelier:0,pose:0};
+  let hd={offre:0,plan:0,suivi:0,suivi_prod:0,prg:0,collage:0,deli_m:0,deli_mo:0,chant_m:0,chant_mo:0,cnc_m:0,cnc_mo:0,montage:0,demont:0,emball:0,finition:0,fer:0,transport:0,pose:0,go:0};
+  // Lots dans l'offre uniquement pour le résumé
+  const lotsOffre=lots.filter(l=>l.dans_offre!==false);
+  const rows=lotsOffre.map((l,i)=>{
+    const r=calcLot(l);
+    ta+=r.tot_a;tv+=r.tot_v;th+=r.h_total;
+    ma_m+=r.mat_a;mv_m+=r.mat_v;ma_q+=r.quinc_a;mv_q+=r.quinc_v;
+    ma_s+=r.stt_a;mv_s+=r.stt_v;ma_mo+=r.mo_total;mv_mo+=r.mo_v;
+    if(r.hg_cadre!=null){hg.cadre+=r.hg_cadre;hg.etude+=r.hg_etude;hg.machine+=r.hg_machine;hg.atelier+=r.hg_atelier;hg.pose+=r.hg_pose;}
+    if(r.hd) Object.keys(hd).forEach(k=>{hd[k]+=(r.hd[k]||0);});
+    return{l,r,i};
+  });
+  const mg=tv>0?(tv-ta)/tv:0;
+  const htot_mo=hg.cadre+hg.etude+hg.machine+hg.atelier+hg.pose||1;
+
+  // Couleurs groupes
+  const GC={cadre:'#1a4a8a',etude:'#2a5438',machine:'#8a4a00',atelier:'#6a1870',pose:'#a02020'};
+  const GL={cadre:'Cadre',etude:'Étude',machine:'MO Machine',atelier:'MO Atelier',pose:'MO Pose'};
+
+  function grpRow(key,postes){
+    const h=hg[key]||0;
+    const pct=htot_mo>0?((h/htot_mo)*100).toFixed(1):0;
+    const rows=postes.map(([lbl,val])=>val>0?`<tr style="background:none">
+      <td style="font-size:11px;color:var(--txt2);padding:2px 6px 2px 20px">${lbl}</td>
+      <td class="r" style="font-size:11px;padding:2px 6px;font-variant-numeric:tabular-nums">${fH(val)}</td>
+      <td class="r" style="font-size:11px;padding:2px 6px;color:var(--txt3)">${fN(val/8,1)} j</td>
+    </tr>`:'').join('');
+    return`<tr style="background:${GC[key]}18;border-left:3px solid ${GC[key]}">
+      <td style="font-weight:600;font-size:12.5px;color:${GC[key]};padding:5px 8px">${GL[key]}</td>
+      <td class="r" style="font-weight:600;font-size:12.5px;padding:5px 8px;font-variant-numeric:tabular-nums">${fH(h)}</td>
+      <td class="r" style="font-size:11px;padding:5px 8px;color:${GC[key]};font-weight:500">${pct} %</td>
+    </tr>${rows}`;
+  }
+
+  el.innerHTML=`
+  <div class="kpis">
+    <div class="kpi"><div class="lb">Coût total achat</div><div class="v">${fE(ta)}</div></div>
+    <div class="kpi hl"><div class="lb">Prix vente HT</div><div class="v">${fE(tv)}</div></div>
+    <div class="kpi"><div class="lb">Marge brute</div><div class="v">${fP(mg)}</div><div class="sb">${fE(tv-ta)}</div></div>
+    <div class="kpi"><div class="lb">Heures totales</div><div class="v">${fH(th)}</div><div class="sb">${fN(th/8,1)} jours</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <div class="card">
+      <div class="card-hd"><h3>Prix vente par lot</h3></div>
+      <table class="tbl"><thead><tr><th>Lot</th><th></th><th class="r">Qté</th><th class="r">Vente unit.</th><th class="r">Vente total</th><th class="r">Marge</th><th class="r">H. unit.</th></tr></thead>
+      <tbody>${rows.map(({l,r,i})=>`<tr style="cursor:pointer" onclick="sel(${i});showTab('lot')">
+        <td>${l.name}</td>
+        <td><span class="badge ${l.type==='menuiserie'?'bm':'bs'}">${l.type==='menuiserie'?'MEN':'STT'}</span></td>
+        <td class="r" style="font-weight:600;color:var(--acc)">${r.qty||1}</td>
+        <td class="r" style="color:var(--txt2)">${fE(r.tot_v1)}</td>
+        <td class="r acc">${fE(r.tot_v)}</td>
+        <td class="r">${fP(r.marge)}</td>
+        <td class="r">${fH(r.h_total1)}</td>
+      </tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="2"><strong>TOTAL</strong></td><td class="r"></td><td class="r"></td><td class="r acc">${fE(tv)}</td><td class="r">${fP(mg)}</td><td class="r">${fH(th)}</td></tr></tfoot>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><h3>Décomposition coûts</h3></div>
+      <div style="padding:10px 12px">
+        <canvas id="pie-couts" width="260" height="200" style="display:block;margin:0 auto"></canvas>
+        <table class="tbl" style="margin-top:10px"><thead><tr><th>Poste</th><th class="r">Achat</th><th class="r">Vente</th><th class="r">% vente</th></tr></thead>
+        <tbody>
+          <tr><td>Matériaux + chants</td><td class="r">${fE(ma_m)}</td><td class="r">${fE(mv_m)}</td><td class="r">${tv?fP(mv_m/tv):'—'}</td></tr>
+          <tr><td>Quincaillerie</td><td class="r">${fE(ma_q)}</td><td class="r">${fE(mv_q)}</td><td class="r">${tv?fP(mv_q/tv):'—'}</td></tr>
+          <tr><td>Sous-traitants</td><td class="r">${fE(ma_s)}</td><td class="r">${fE(mv_s)}</td><td class="r">${tv?fP(mv_s/tv):'—'}</td></tr>
+          <tr><td>Main-d'œuvre</td><td class="r">${fE(ma_mo)}</td><td class="r">${fE(mv_mo)}</td><td class="r">${tv?fP(mv_mo/tv):'—'}</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td class="r">${fE(ta)}</td><td class="r acc">${fE(tv)}</td><td class="r">100 %</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+    <div class="card">
+      <div class="card-hd"><h3>Heures MO — détail par groupe</h3><span class="card-tt">Total ${fH(hg.cadre+hg.etude+hg.machine+hg.atelier+hg.pose)}</span></div>
+      <div style="padding:8px 12px">
+        <table class="tbl" style="border:none">
+          <thead><tr><th>Groupe / Poste</th><th class="r">Heures</th><th class="r">% MO</th></tr></thead>
+          <tbody>
+            ${grpRow('cadre',[['Offre',hd.offre],['Prise de mesures',hd.mesures],['Administratif',hd.admin],['Suivi gestionnaire',hd.suivi],['Suivi production',hd.suivi_prod]])}
+            ${grpRow('etude',[['Plan',hd.plan],['Programmation CNC',hd.prg]])}
+            ${grpRow('machine',[['Déligneuse machine',hd.deli_m],['MO déligneuse',hd.deli_mo],['Encoleuse machine',hd.chant_m],['MO encoleuse',hd.chant_mo],['CNC machine',hd.cnc_m],['H/Mo CNC',hd.cnc_mo]])}
+            ${grpRow('atelier',[['Collage spécial',hd.collage],['Montage atelier',hd.montage],['Démontage',hd.demont],['Emballage',hd.emball],['Finition',hd.finition],['Ferronnerie',hd.fer]])}
+            ${grpRow('pose',[['Transport',hd.transport],['Pose',hd.pose],['Gros œuvre',hd.go]])}
+          </tbody>
+          <tfoot><tr><td><strong>Total MO</strong></td><td class="r"><strong>${fH(hg.cadre+hg.etude+hg.machine+hg.atelier+hg.pose)}</strong></td><td class="r">100 %</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><h3>Répartition heures MO</h3></div>
+      <div style="padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:16px">
+        <canvas id="pie-mo" width="220" height="220"></canvas>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+          ${Object.keys(GC).map(k=>`
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px">
+              <div style="width:12px;height:12px;border-radius:2px;background:${GC[k]};flex-shrink:0"></div>
+              <span>${GL[k]} — ${fH(hg[k])}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+  </div>`;
+
+  // Dessiner les camemberts après injection HTML
+  requestAnimationFrame(()=>{
+    // Pie coûts
+    drawPie('pie-couts',[
+      {label:'Matériaux',val:mv_m,color:'#2a5438'},
+      {label:'Quinc.',val:mv_q,color:'#8a4a00'},
+      {label:'STT',val:mv_s,color:'#6a1870'},
+      {label:'MO',val:mv_mo,color:'#1a4a8a'},
+    ]);
+    // Pie MO heures
+    drawPie('pie-mo',Object.keys(GC).map(k=>({label:GL[k],val:hg[k],color:GC[k]})));
+  });
+}
+
+function drawPie(canvasId, data){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const total=data.reduce((s,d)=>s+(d.val||0),0);
+  if(!total){ctx.clearRect(0,0,canvas.width,canvas.height);return;}
+  const cx=canvas.width/2, cy=canvas.height/2;
+  const r=Math.min(cx,cy)-18;
+  let angle=-Math.PI/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  data.forEach(d=>{
+    if(!d.val)return;
+    const slice=(d.val/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice);
+    ctx.closePath();ctx.fillStyle=d.color;ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    // Label % si assez grand
+    if(slice>0.2){
+      const mx=cx+Math.cos(angle+slice/2)*(r*0.65);
+      const my=cy+Math.sin(angle+slice/2)*(r*0.65);
+      ctx.fillStyle='#fff';ctx.font='bold 11px Segoe UI,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(((d.val/total)*100).toFixed(0)+'%',mx,my);
+    }
+    angle+=slice;
+  });
+}
+
+// ─── Bordereaux multiples (niveau lot) ───────────────────────────────────────
+let _brdActif=null; // index du bordereau actif
+let _brdTarget=null; // {type:'mat'|'chant', idx:Number} — ligne à mettre à jour après Appliquer
+
+function brdUid(){return'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+// Générer un ID lisible L{lot}B{brd}
+function brdRef(lotIdx, brdIdx){
+  return 'L'+(lotIdx+1)+'B'+(brdIdx+1);
+}
+
+// Renommer tous les bordereaux existants avec des refs lisibles
+function renommerBordereaux(){
+  chantierBordereaux.forEach((brd, bi)=>{
+    if(!brd.ref) brd.ref = 'B'+(bi+1);
+    // Mettre à jour le nom si c'est un nom générique
+    if(!brd.nom || brd.nom.match(/^Bordereau\s*\d*$/) || brd.nom.match(/^B\d+$/)){
+      brd.nom = brd.ref;
+    }
+  });
+}
+
+function getBordereaux(){return getLotBordereaux();}
+function findBordGlobalIndex(id=_brdActif){ return chantierBordereaux.findIndex(b=>b.id===id); }
+function findCurrentBord(){
+  if(!_brdActif) return null;
+  return chantierBordereaux.find(b=>b.id===_brdActif) || null;
+}
+function syncBordCopies(id=_brdActif){
+  const src=chantierBordereaux.find(b=>b.id===id);
+  if(!src) return;
+  lots.forEach(l=>{
+    if(!l.bordereaux) return;
+    const i=l.bordereaux.findIndex(b=>b.id===id);
+    if(i>=0) l.bordereaux[i]=JSON.parse(JSON.stringify(src));
+  });
+}
+
+// Calcul totaux d'un bordereau
+function brdTotaux(brd){
+  let m2=0,ml=0,cht=0,chl=0,chc=0;
+  (brd.pieces||[]).forEach(p=>{
+    if(p.type==='section') return; // ignorer les sous-titres
+    const l=parseFloat(p.long)||0,la=parseFloat(p.larg)||0,n=parseFloat(p.nb)||1;
+    const cl=parseInt(p.ch_l)||0,cc=parseInt(p.ch_c)||0;
+    m2+=l*la*n; ml+=(2*l+2*la)*n;
+    chl+=cl*n; chc+=cc*n;
+    // Formule correcte : ((Long × Ch.Long) + (Larg × Ch.Larg)) × Nb
+    cht+=((l*cl)+(la*cc))*n;
+  });
+  return{m2,ml,cht,chl,chc};
+}
+
+function openBordForTarget(type, idx){
+  _brdTarget = {type, idx};
+  const currentId = type==='mat' ? lots[act].mats[idx].brd_id : lots[act].chants[idx].brd_id;
+  const lotBrds=getLotBordereaux();
+  _brdActif = (currentId && lotBrds.some(b=>b.id===currentId)) ? currentId : (lotBrds[0]?.id || null);
+  renderBrdList();
+  renderBrdContent();
+  document.getElementById('bov').classList.add('open');
+}
+
+function openBord(){
+  const lotBrds=getLotBordereaux();
+  _brdActif=lotBrds[0]?.id || null;
+  renderBrdList();
+  renderBrdContent();
+  document.getElementById('bov').classList.add('open');
+}
+function closeBord(){document.getElementById('bov').classList.remove('open');_brdActif=null;_brdTarget=null;}
+const _bovEl=document.getElementById('bov');if(_bovEl)_bovEl.addEventListener('click',e=>{if(e.target===e.currentTarget)closeBord();});
+
+// IDs des bordereaux déjà utilisés dans le lot actif
+function brdIdsInLot(){
+  return new Set(getLotBordereauIds());
+}
+
+function renderBrdList(){
+  const brds=getLotBordereaux();
+  const el=document.getElementById('brd-list');
+  if(!brds.length){
+    el.innerHTML='<div style="padding:8px 12px;font-size:12px;color:var(--txt3);font-style:italic">Aucun bordereau pour ce lot — créez-en un avec "+ Nouveau"</div>';
+    return;
+  }
+  el.innerHTML=brds.map((b,i)=>{
+    const t=brdTotaux(b);
+    return`<div class="brd-item${b.id===_brdActif?' on':''}" onclick="selBrd('${b.id}')" style="position:relative">
+      <div style="display:flex;align-items:center;gap:5px">
+        <span style="font-weight:700;font-size:12px;color:var(--acc)">${b.ref||'B'+(i+1)}</span>
+        <span style="font-size:9px;background:#2a5438;color:#fff;border-radius:3px;padding:1px 4px">ce lot</span>
+      </div>
+      <div style="font-size:12px;color:var(--txt)">${b.nom!==b.ref?(b.nom||'Sans nom'):''}</div>
+      <div class="brd-sub">${(b.pieces||[]).filter(p=>p.type!=='section').length} pièce(s) · ${f3(t.m2)} m² · ${f3(t.ml)} ml périm. · ${f3(t.cht)} ml</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBrdContent(){
+  const empty=document.getElementById('brd-empty');
+  const content=document.getElementById('brd-content');
+  if(!empty||!content) return;
+  const brd=findCurrentBord();
+  if(!brd){
+    empty.style.display='block';content.style.display='none';
+    return;
+  }
+  empty.style.display='none';content.style.display='block';
+  const inp=document.getElementById('brd-name-inp');if(inp)inp.value=brd.nom||'';
+  renderBordRows();
+}
+
+function selBrd(id){
+  const brd = getLotBordereaux().find(b=>b.id===id);
+  if(!brd) return;
+  _brdActif=id;
+  renderBrdList();renderBrdContent();
+}
+
+function addBordereau(){
+  const ref = 'L'+(act+1)+'B'+(getLotBordereaux().length+1);
+  const newBrd={id:brdUid(), ref, nom:ref, pieces:[{nom:'',long:'',larg:'',nb:'1',ch_l:'0',ch_c:'0'}]};
+  chantierBordereaux.push(newBrd);
+  if(!lots[act].bordereaux) lots[act].bordereaux=[];
+  lots[act].bordereaux.push(JSON.parse(JSON.stringify(newBrd)));
+  _brdActif=newBrd.id;
+  renderBrdList();renderBrdContent();
+  autoSave();
+  setTimeout(()=>document.getElementById('brd-name-inp').select(),30);
+}
+
+function deleteBrd(){
+  const brd=findCurrentBord();
+  if(!brd) return;
+  const nom=brd.nom||'ce bordereau';
+  if(!confirm(`Supprimer "${nom}" ?`)) return;
+  const id=brd.id;
+  const gi=findBordGlobalIndex(id);
+  if(gi>=0) chantierBordereaux.splice(gi,1);
+  lots.forEach(l=>{
+    l.bordereaux=(l.bordereaux||[]).filter(b=>b.id!==id);
+    (l.mats||[]).forEach(m=>{if(m.brd_id===id){m.brd_id='';m.src='manual';}});
+    (l.chants||[]).forEach(ch=>{if(ch.brd_id===id){ch.brd_id='';ch.src='manual';}});
+  });
+  const lotBrds=getLotBordereaux();
+  _brdActif=lotBrds[0]?.id || null;
+  renderBrdList();renderBrdContent();
+  autoSave();
+}
+
+function ouvrirCopierBord(){
+  // Construire la liste de tous les bordereaux de tous les lots (sauf le lot actif)
+  const list = document.getElementById('copy-brd-list');
+  let html = '';
+  lots.forEach((lot, li)=>{
+    if(!lot.bordereaux || !lot.bordereaux.length) return;
+    html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);padding:8px 10px 4px;background:var(--sur2);border-top:1px solid var(--bor)">${lot.name}</div>`;
+    lot.bordereaux.forEach((brd, bi)=>{
+      const t = brdTotaux(brd);
+      const isCurrent = li===act;
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--bor);${isCurrent?'opacity:.4':''}" >
+        <div>
+          <span style="font-weight:600;font-size:13px">${brd.ref||brd.nom}</span>
+          <span style="color:var(--txt3);font-size:11px;margin-left:8px">${brd.nom!==brd.ref?brd.nom:''}</span>
+          <div style="font-size:11px;color:var(--txt3)">${brd.pieces.length} pièce(s) · ${f3(t.m2)} m² · ${f3(t.cht)} ml cht</div>
+        </div>
+        ${isCurrent
+          ? '<span style="font-size:11px;color:var(--txt3);font-style:italic">lot actif</span>'
+          : `<button class="btn btn-sm btn-p" onclick="copierBordereau(${li},${bi})">Copier ici</button>`
+        }
+      </div>`;
+    });
+  });
+  if(!html) html = '<div style="padding:20px;text-align:center;color:var(--txt3);font-style:italic">Aucun bordereau dans les autres lots.</div>';
+  list.innerHTML = html;
+  document.getElementById('copy-bov').classList.add('open');
+}
+
+function fermerCopierBord(){
+  document.getElementById('copy-bov').classList.remove('open');
+}
+
+function copierBordereau(lotSrc, brdSrc){
+  const src = lots[lotSrc].bordereaux[brdSrc];
+  if(!src) return;
+  if(!lots[act].bordereaux) lots[act].bordereaux=[];
+  // Copie profonde avec nouvel ID et nouvelle ref
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = brdUid();
+  copy.ref = brdRef(act, lots[act].bordereaux.length);
+  copy.nom = copy.ref + ' (copie de ' + (src.ref||src.nom) + ')';
+  lots[act].bordereaux.push(copy);
+  _brdActif = copy.id;
+  fermerCopierBord();
+  renderBrdList();
+  renderBrdContent();
+  ra();
+}
+
+function renameBrd(val){
+  const brd=findCurrentBord();
+  if(!brd) return;
+  brd.nom=val;
+  syncBordCopies(brd.id);
+  renderBrdList();
+}
+
+function renderBordRows(){
+  const gi=findBordGlobalIndex();
+  if(gi<0) return;
+  const pieces=(chantierBordereaux[gi].pieces||[]);
+  document.getElementById('btbody').innerHTML=pieces.map((p,i)=>{
+    // Ligne de section (sous-titre)
+    if(p.type==='section'){
+      return`<tr style="background:var(--sur2)">
+        <td colspan="8" style="padding:4px 6px">
+          <input type="text" class="nom" value="${p.nom||''}" placeholder="Nom de la section…"
+            style="width:100%;font-weight:600;font-size:12px;color:var(--txt2);background:transparent;border:none;outline:none;border-bottom:1px solid var(--bor2)"
+            oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].nom=this.value;syncBordCopies()">
+        </td>
+        <td style="white-space:nowrap;padding:2px 4px">
+          <button style="border:1px solid var(--bor2);background:var(--sur);color:var(--acc);cursor:pointer;font-size:11px;padding:1px 6px;border-radius:3px;margin-right:3px"
+            title="Insérer une pièce après cette section"
+            onclick="insererPiece(${i})">+ Pièce</button>
+          <button style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:1px 4px"
+            onclick="chantierBordereaux[findBordGlobalIndex()].pieces.splice(${i},1);syncBordCopies();renderBordRows()">✕</button>
+        </td>
+      </tr>`;
+    }
+    // Ligne normale
+    const l=parseFloat(p.long)||0,la=parseFloat(p.larg)||0,n=parseFloat(p.nb)||1;
+    const chl=parseInt(p.ch_l)||0,chc=parseInt(p.ch_c)||0;
+    const m2=l*la*n, ml=(2*l+2*la)*n, cht=((l*chl)+(la*chc))*n;
+    return`<tr>
+      <td><input type="text" class="nom" value="${p.nom||''}" placeholder="Joue, Porte, Mt…"
+        style="width:100%" oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].nom=this.value;syncBordCopies();recalcBord()"></td>
+      <td><input type="number" step=".001" value="${p.long||''}" placeholder="0.000" style="width:72px"
+        oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].long=this.value;syncBordCopies();recalcBord()"></td>
+      <td><input type="number" step=".001" value="${p.larg||''}" placeholder="0.000" style="width:72px"
+        oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].larg=this.value;syncBordCopies();recalcBord()"></td>
+      <td><input type="number" step="1" min="1" value="${p.nb||1}" style="width:42px"
+        oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].nb=this.value;syncBordCopies();recalcBord()"></td>
+      <td class="r" style="color:${m2>0?'var(--acc)':'var(--txt3)'}"><strong>${m2>0?f3(m2):'—'}</strong></td>
+      <td class="r" style="color:var(--txt2);font-size:11.5px">${ml>0?f3(ml):'—'}</td>
+      <td><input type="number" step="1" min="0" value="${p.ch_l||0}" style="width:40px"
+        title="Nb chants côtés Long" oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].ch_l=this.value;syncBordCopies();recalcBord()"></td>
+      <td><input type="number" step="1" min="0" value="${p.ch_c||0}" style="width:40px"
+        title="Nb chants côtés Larg" oninput="chantierBordereaux[findBordGlobalIndex()].pieces[${i}].ch_c=this.value;syncBordCopies();recalcBord()"></td>
+      <td class="r" style="color:${cht>0?'var(--acc)':'var(--txt3)'}"><strong>${cht>0?f3(cht):'—'}</strong></td>
+      <td style="white-space:nowrap">
+        <button style="border:none;background:none;color:var(--txt3);cursor:pointer;font-size:11px;padding:1px 3px"
+          title="Insérer une pièce après" onclick="insererPiece(${i})">＋</button>
+        <button style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:1px 4px"
+          onclick="chantierBordereaux[findBordGlobalIndex()].pieces.splice(${i},1);syncBordCopies();renderBordRows()">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+  recalcBord();
+}
+
+function recalcBord(){
+  const gi=findBordGlobalIndex();
+  if(gi<0) return;
+  const t=brdTotaux(chantierBordereaux[gi]);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('bnet_m2', f3(t.m2)+' m²');
+  set('bnet_ml', f3(t.ml)+' ml');
+  set('bnet_chl', t.chl||'—');
+  set('bnet_chc', t.chc||'—');
+  set('bnet_cht', f3(t.cht)+' ml');
+  set('bbrut_m2', f3(t.m2)+' m²');
+  set('bbrut_cht', f3(t.cht)+' ml');
+  const n=(chantierBordereaux[gi].pieces||[]).filter(p=>p.type!=='section').length;
+  set('bsub', `${n} pièce(s) · ${f3(t.m2)} m² net · ${f3(t.cht)} ml chants`);
+  renderBrdList();
+}
+
+function insererPiece(afterIdx){
+  const gi=findBordGlobalIndex();
+  if(gi<0) return;
+  const pieces = chantierBordereaux[gi].pieces;
+  pieces.splice(afterIdx+1, 0, {nom:'',long:'',larg:'',nb:'1',ch_l:'0',ch_c:'0'});
+  syncBordCopies();
+  renderBordRows();
+  setTimeout(()=>{
+    const rows = document.querySelectorAll('#btbody tr');
+    if(rows[afterIdx+1]){
+      const inp = rows[afterIdx+1].querySelector('input');
+      if(inp) inp.focus();
+    }
+  }, 30);
+}
+
+function addBordSection(){
+  const gi=findBordGlobalIndex();
+  if(gi<0) return;
+  chantierBordereaux[gi].pieces.push({type:'section',nom:''});
+  syncBordCopies();
+  renderBordRows();
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('#btbody tr');
+    if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp)inp.focus();}
+  },30);
+}
+
+function addBordRow(){
+  const gi=findBordGlobalIndex();
+  if(gi<0) return;
+  chantierBordereaux[gi].pieces.push({nom:'',long:'',larg:'',nb:'1',ch_l:'0',ch_c:'0'});
+  syncBordCopies();
+  renderBordRows();
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('#btbody tr');
+    if(rows.length){const inp=rows[rows.length-1].querySelector('input');if(inp)inp.focus();}
+  },30);
+}
+
+function saveBord(){
+  // Si ouvert depuis un matériau ou chant, appliquer le bordereau sélectionné
+  const brd=findCurrentBord();
+  if(_brdTarget!==null && brd){
+    if(_brdTarget.type==='mat'){
+      lots[act].mats[_brdTarget.idx].brd_id = brd.id;
+    } else {
+      lots[act].chants[_brdTarget.idx].brd_id = brd.id;
+    }
+    _brdTarget = null;
+  }
+  syncBordCopies();
+  closeBord();
+  ra();
+}
+
+
+// Calcul des heures mobilier pour le lot (pour calcLot)
+function getMobH(lot){
+  if(lot.mobRows && lot.mobRows.length){
+    let at=0,po=0;
+    (lot.mobRows||[]).forEach(r=>{
+      if((r.type||'row')!=='row') return;
+      const qty=parseFloat(r.qty)||0;
+      const hAt=parseFloat(r.h_at ?? r.heures_at ?? 0)||0;
+      const hPo=parseFloat(r.h_po ?? r.heures_po ?? 0)||0;
+      at += qty*hAt;
+      po += qty*hPo;
+    });
+    return{h_mob_at:at,h_mob_po:po};
+  }
+  MOB=buildMOB(lot);
+  let at=0,po=0;
+  if(!lot.mob||!MOB.length) return{h_mob_at:0,h_mob_po:0};
+  MOB.forEach((m,i)=>{
+    const entry=(lot.mob&&lot.mob[i])||{qty_at:0,qty_po:0};
+    at+=m[3]*(entry.qty_at!=null?entry.qty_at:(entry.qty||0));
+    po+=m[4]*(entry.qty_po!=null?entry.qty_po:(entry.qty||0));
+  });
+  return{h_mob_at:at,h_mob_po:po};
+}
+
+// ─── Sauvegarde / Chargement chantier ────────────────────────────────────────
+
+// ─── Sauvegarde / Chargement via API Flask ────────────────────────────────────
+let _chantier_id = null;
+let _saveTimer = null;
+
+// ─── Export pour le planning de production ──────────────────────────────────
+// Génère un JSON au format attendu par l'app planning (stratégie A hybride) :
+//   - sous-totaux de groupe : bureau (= étude), atelier (= montage+demont+emball+collage+finition+fer), pose
+//   - postes mono-ligne : DEBITAGE (deli_mo), CHANTS (chant_mo), CNC (cnc_mo), PROG_CNC (prg), TRANSPORT
+//   - ignoré : finition, fer, go, offre, mesures, admin, suivi, suivi_prod, deli_m, chant_m, cnc_m
+// Heures agrégées sur les lots "dans l'offre" uniquement. Le planning divisera par 8.
+function exportPlanning() {
+  if (!lots || !lots.length) {
+    alert("Aucun lot dans le chantier — rien à exporter.");
+    return;
+  }
+  // Agrégation des heures par clé du calculateur (identique à renderRes())
+  const hd = {offre:0, mesures:0, plan:0, admin:0, suivi:0, suivi_prod:0, prg:0,
+              collage:0, deli_m:0, deli_mo:0, chant_m:0, chant_mo:0, cnc_m:0, cnc_mo:0,
+              montage:0, demont:0, emball:0, finition:0, fer:0,
+              transport:0, pose:0, go:0};
+  const lotsOffre = lots.filter(l => l.dans_offre !== false);
+  if (!lotsOffre.length) {
+    alert("Aucun lot dans l'offre — rien à exporter.\nActivez « Dans l'offre » sur au moins un lot.");
+    return;
+  }
+  lotsOffre.forEach(l => {
+    const r = calcLot(l);
+    if (r.hd) Object.keys(hd).forEach(k => { hd[k] += (r.hd[k] || 0); });
+  });
+
+  // Mapping vers les heures planning (stratégie A hybride)
+  const heures = {
+    // Sous-totaux de groupe (somme des postes du groupe)
+    bureau:   round2(hd.plan),
+    atelier:  round2(hd.montage + hd.demont + hd.emball + hd.collage),
+    pose:     round2(hd.pose),
+    // Postes mono-ligne (prise du MO, pas du M)
+    PROG_CNC: round2(hd.prg),
+    DEBITAGE: round2(hd.deli_mo),
+    CHANTS:   round2(hd.chant_mo),
+    CNC:      round2(hd.cnc_mo),
+    TRANSPORT: round2(hd.transport),
+  };
+  // On retire les entrées à zéro pour alléger le JSON
+  Object.keys(heures).forEach(k => { if (!heures[k]) delete heures[k]; });
+
+  // Extraction ID et nom depuis le champ ref (format: "9214_1 — Kitchen & Coffee Corner")
+  const refVal = (document.getElementById('ref')?.value || '').trim();
+  let id = refVal, name = '';
+  const sep = refVal.indexOf('—');
+  if (sep >= 0) { id = refVal.slice(0, sep).trim(); name = refVal.slice(sep + 1).trim(); }
+  else {
+    // Fallback sur tiret simple ou premier espace
+    const m = refVal.match(/^(\S+)\s+(.+)$/);
+    if (m) { id = m[1]; name = m[2]; }
+  }
+  if (!id) { alert("Référence chantier vide — impossible d'exporter."); return; }
+
+  const dateDebut = document.getElementById('date_debut')?.value || null;
+  const dateFin   = document.getElementById('date_fin')?.value   || null;
+
+  const devisJson = {
+    source: "calculateur-verbruggen",
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    chantier: { id, name, dateDebut, dateFin },
+    heures,
+  };
+
+  // Téléchargement comme fichier
+  const filename = `devis_${id.replace(/[^\w-]/g, '_')}_planning.json`;
+  const blob = new Blob([JSON.stringify(devisJson, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Toast de confirmation dans le statut existant
+  const el = document.getElementById('save-status');
+  if (el) { el.textContent = '✓ Export planning téléchargé'; setTimeout(() => { el.textContent = ''; }, 3000); }
+}
+
+function round2(v) { return Math.round((Number(v) || 0) * 100) / 100; }
+
+async function saveCurrentChantier() {
+  if (!_chantier_id) return;
+  let tv = 0;
+  lots.forEach(l => {
+    const r = calcLot(l);
+    tv += r.tot_v;
+    l._cache_tv = r.tot_v1;  // Prix UNITAIRE stocké pour l'offre
+    l._cache_tv_total = r.tot_v; // Prix TOTAL (×qty)
+    if(l.qty===undefined) l.qty=1;
+  });
+  const params = {cm:gv('cm'),cq:gv('cq'),cs:gv('cs'),cmo:gv('cmo'),tof:gv('tof'),tet:gv('tet'),ta:gv('ta'),tdl:gv('tdl'),tcl:gv('tcl'),tm:gv('tm'),tp:gv('tp'),tt:gv('tt'),tg:gv('tg'),tf:gv('tf'),cc:gv('cc')};
+  const date_debut = document.getElementById('date_debut')?.value || null;
+  const date_fin   = document.getElementById('date_fin')?.value   || null;
+  const payload = {
+    lots: JSON.parse(JSON.stringify(lots)),
+    params,
+    prix_vente: Math.round(tv),
+    bordereaux: JSON.parse(JSON.stringify(chantierBordereaux)),
+    date_debut,
+    date_fin,
+  };
+  try {
+    await fetch(`/api/chantiers/${_chantier_id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const el = document.getElementById('save-status');
+    if (el) { el.textContent = '✓ Sauvegardé'; setTimeout(() => { el.textContent = ''; }, 2000); }
+  } catch(e) {
+    console.error('Erreur sauvegarde:', e);
+  }
+}
+
+function saveNow() { clearTimeout(_saveTimer); saveCurrentChantier(); }
+
+let _serverModified = 0;
+
+async function recalculerDepuisOffre(){
+  if(!_chantier_id){ alert('Veuillez sauvegarder le chantier.'); return; }
+  try {
+    const res = await fetch('/api/chantiers/' + _chantier_id);
+    if(!res.ok) return;
+    const c = await res.json();
+    let changed = 0;
+    (c.lots||[]).forEach((serverLot, i) => {
+      if(lots[i] && serverLot.qty !== undefined && serverLot.qty !== lots[i].qty){
+        lots[i].qty = serverLot.qty;
+        changed++;
+      }
+    });
+    if(changed > 0){
+      ra();
+      alert(changed + ' lot(s) mis à jour depuis l\'offre.');
+    } else {
+      alert('Les quantités sont déjà à jour.');
+    }
+  } catch(e) { alert('Erreur : ' + e.message); }
+}
+function ouvrirOffre(){
+  if(!_chantier_id){alert('Veuillez sauvegarder le chantier.');return;}
+  saveCurrentChantier().then(()=>{
+    window.open('/offre?id='+_chantier_id,'_blank');
+  });
+}
+function autoSave() { clearTimeout(_saveTimer); _saveTimer = setTimeout(saveCurrentChantier, 1200); }
+
+function loadFromChantier(c) {
+  _chantier_id = c.id;
+  _serverModified = c.modified || 0;
+  // Charger les bordereaux globaux - TOUJOURS fusionner depuis les lots pour ne rien perdre
+  // Robustesse : c.bordereaux peut historiquement être un objet {} au lieu d'un []
+  const serverBrds = Array.isArray(c.bordereaux) ? c.bordereaux : [];
+  const seen = new Set(serverBrds.map(b=>b.id));
+  // Récupérer tous les bordereaux dans les lots qui ne seraient pas encore au niveau chantier
+  (c.lots||[]).forEach(l=>{
+    (l.bordereaux||[]).forEach(b=>{
+      if(!seen.has(b.id)){ seen.add(b.id); serverBrds.push(b); }
+    });
+  });
+  chantierBordereaux = serverBrds;
+  document.getElementById('ref').value = `${c.ref} — ${c.nom}`;
+  // Dates chantier (pour export planning)
+  const elDeb = document.getElementById('date_debut');
+  const elFin = document.getElementById('date_fin');
+  if (elDeb) elDeb.value = c.date_debut || '';
+  if (elFin) elFin.value = c.date_fin   || '';
+  if (c.params) {
+    ['cm','cq','cs','cmo','tof','tet','ta','tdl','tcl','tm','tp','tt','tg','tf','cc'].forEach(k => {
+      const el = document.getElementById(k);
+      if (el && c.params[k] !== undefined) el.value = c.params[k];
+    });
+    if(c.params.te !== undefined){
+      const eof=document.getElementById('tof'); if(eof && (c.params.tof===undefined)) eof.value = c.params.te;
+      const eet=document.getElementById('tet'); if(eet && (c.params.tet===undefined)) eet.value = c.params.te;
+    }
+  }
+  if (c.lots && c.lots.length) {
+    c.lots.forEach(lot => {
+      if (!lot.auto_cfg || typeof lot.auto_cfg !== 'object') lot.auto_cfg = {};
+      if (!lot.bordereaux) lot.bordereaux = [];
+      if (!lot.mats) lot.mats = [];
+      if (!lot.chants) lot.chants = [];
+      if (!lot.quinc) lot.quinc = [];
+      if (!lot.stt) lot.stt = [];
+      lot.stt = lot.stt.map(s => {
+        const row = {...s};
+        if (row.qty !== undefined && row.qty_l === undefined) {
+          row.qty_l = row.qty;
+          delete row.qty;
+        }
+        const rs = calcSttRow(row, 1.27);
+        return {...row, ...rs};
+      });
+      if (!lot.mobRows) lot.mobRows = [];
+      lot.mobRows = (lot.mobRows||[]).map(r=>{
+        if((r.type||'row')==='section') return {type:'section', label:r.label||r.desc||''};
+        return {
+          type:'row',
+          desc:r.desc||r.label||'',
+          unit:r.unit||'pc',
+          qty:parseFloat(r.qty ?? r.qte ?? 0)||0,
+          h_at:parseFloat(r.h_at ?? r.hat ?? r.heures_at ?? 0)||0,
+          h_po:parseFloat(r.h_po ?? r.hpo ?? r.heures_po ?? 0)||0,
+        };
+      });
+      if (lot.mob_modele_id===undefined || lot.mob_modele_id===null || lot.mob_modele_id==='') lot.mob_modele_id = _mobActiveModelId || (_mobModelList[0]?.id||0);
+      ensureLotMobEntries(lot);
+      if (lot.pieces && lot.pieces.length && !lot.bordereaux.length) {
+        lot.bordereaux.push({id:'b'+Date.now(), nom:'Bordereau principal', pieces:lot.pieces});
+        delete lot.pieces;
+      }
+      if (lot.qty === undefined || lot.qty < 1) lot.qty = 1;
+      lot.mats.forEach(m => { if (!m.brd_id) m.brd_id = ''; if (!m.coeff_chute) m.coeff_chute = 1.3; });
+      lot.chants.forEach(ch => { if (!ch.brd_id) ch.brd_id = ''; if (!ch.coeff_cht) ch.coeff_cht = 1.0; });
+      lot.quinc.forEach(q => {
+        if (q.qty !== undefined && (q.pc_u===undefined || q.pc_u===null || q.pc_u==='')) { q.pc_u=1; q.nb_u=coefValue(q.qty,1); q.coef=1; delete q.qty; }
+        if (q.pc_u===undefined || q.pc_u===null || q.pc_u==='') q.pc_u=1;
+        if (q.nb_u===undefined || q.nb_u===null || q.nb_u==='') q.nb_u=1;
+        if (q.coef===undefined || q.coef===null || q.coef==='') q.coef=1;
+      });
+    });
+    lots = c.lots; act = 0;
+  } else {
+    lots = [newLot('Lot 1')]; act = 0;
+  }
+  renommerBordereaux();
+  updBD();
+  renderList(); renderLot(); renderRes();
+}
+
+// ─── Actions ─────────────────────────────────────────────────────────────────
+function ra(){updBD();renderList();try{renderLot();}catch(e){console.error('renderLot error:',e);document.getElementById('lot-detail').innerHTML=`<div class="notice" style="background:#fde8e8;border-color:#a02020;color:#a02020">Erreur d'affichage : ${e.message}</div>`;}renderRes();autoSave();}
+function toggleMob(){
+  const el=document.getElementById('mob-detail-'+act);
+  if(!el)return;
+  const visible=el.style.display!=='none';
+  el.style.display=visible?'none':'block';
+  const btn=document.getElementById('btn-mob-toggle');
+  if(btn) btn.textContent=visible?'⊞ Saisir quantités':'✕ Fermer';
+}
+let _rt=null;function raD(){clearTimeout(_rt);_rt=setTimeout(ra,600);}
+function addLot(){lots.push(newLot('Lot '+(lots.length+1)));act=lots.length-1;ra();}
+function sel(i){act=i;ra();}
+function delLot(i){if(!confirm('Supprimer ce lot ?'))return;lots.splice(i,1);if(act>=lots.length)act=lots.length-1;ra();}
+function dupLot(i){
+  const original=lots[i];
+  const copy=JSON.parse(JSON.stringify(original));
+  copy.name=original.name+' (copie)';
+  // Nouveaux IDs pour les bordereaux pour éviter les conflits
+  const idMap={};
+  (copy.bordereaux||[]).forEach(b=>{
+    const newId='b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    idMap[b.id]=newId;
+    b.id=newId;
+  });
+  // Mettre à jour les références brd_id dans mats et chants
+  (copy.mats||[]).forEach(m=>{if(m.brd_id&&idMap[m.brd_id])m.brd_id=idMap[m.brd_id];});
+  (copy.chants||[]).forEach(ch=>{if(ch.brd_id&&idMap[ch.brd_id])ch.brd_id=idMap[ch.brd_id];});
+  lots.splice(i+1,0,copy);
+  act=i+1;
+  ra();
+}
+function showTab(t){['lot','res'].forEach(id=>{document.getElementById('pnl-'+id).classList.toggle('on',id===t);document.getElementById('btn-'+id).classList.toggle('on',id===t);});}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+(async function init() {
+  // 1. Charger taux mobilier + modèles en parallèle
+  try {
+    const mobRes = await fetch('/api/mob');
+    _mobTaux = await mobRes.json();
+    await loadMobModelsMeta();
+    if(_mobActiveModelId) await ensureMobModelLoaded(_mobActiveModelId);
+    MOB = buildMOB();
+  } catch(e) { console.error('Erreur chargement mob:', e); }
+
+  // 2. BD Prix pour autocompletes
+  await syncBDFromServer();
+
+  // 3. Charger les paramètres globaux du calculateur
+  await loadGlobalCalcParams();
+
+  // 4. Charger chantier depuis URL
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (id) {
+    try {
+      const res = await fetch(`/api/chantiers/${id}`);
+      if (res.ok) { loadFromChantier(await res.json()); return; }
+    } catch(e) { console.error('Erreur chargement:', e); }
+  }
+  _chantier_id = null;
+  lots = [newLot('Lot 1')]; act = 0;
+  renderList(); renderLot(); renderRes();
+})();
+</script>
+<!-- ══ Modal Copier Bordereau ══ -->
+<div class="ov" id="copy-bov" onclick="if(event.target===this)fermerCopierBord()">
+<div class="mbox" style="width:520px;max-width:calc(100vw - 24px)">
+  <div class="mhd">
+    <div><h3>Copier un bordereau</h3><div class="msub">Choisissez un bordereau d'un autre lot</div></div>
+    <button class="mcl" onclick="fermerCopierBord()">✕</button>
+  </div>
+  <div class="mbody" style="padding:12px 16px">
+    <div id="copy-brd-list" style="max-height:360px;overflow-y:auto"></div>
+  </div>
+  <div class="mft">
+    <button class="btn" onclick="fermerCopierBord()">Annuler</button>
+  </div>
+</div>
+</div>
+
+</body>
+</html>
