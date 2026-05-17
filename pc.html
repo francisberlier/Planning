@@ -420,7 +420,9 @@ function stopDataListener(){
   if(dataRef&&dataListener) dataRef.off('value',dataListener);
   dataRef=null; dataListener=null;
 }
+var ignoreRemoteUntil=0;
 function applyRemoteData(val){
+  if(Date.now()<ignoreRemoteUntil) return;
   val=val||{};
   if(val.planning) planning=val.planning; else planning={};
   if(val.pointage) pointage=val.pointage; else pointage={};
@@ -512,6 +514,7 @@ function initFirebase(){
 }
 function fbSave(){
   if(!db||!fbConnected||!auth||!auth.currentUser) return;
+  ignoreRemoteUntil=Date.now()+1500;
   try{
     if(role==='chef'){
       db.ref('data').set({

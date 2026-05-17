@@ -406,6 +406,7 @@ function initFirebase(){
 }
 function fbSave(){
   if(!db||!fbConnected) return;
+  ignoreRemoteUntil=Date.now()+1500;
   try{
     db.ref('data').set({
       planning:planning,
@@ -418,9 +419,11 @@ function fbSave(){
     });
   }catch(e){}
 }
+var ignoreRemoteUntil=0;
 function fbListen(){
   if(!db) return;
   db.ref('data').on('value', function(snap){
+    if(Date.now()<ignoreRemoteUntil) return;
     var val=snap.val(); if(!val) return;
     if(val.planning) planning=val.planning;
     if(val.pointage) pointage=val.pointage;
