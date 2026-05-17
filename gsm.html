@@ -1204,7 +1204,7 @@ function pointageDetailHtml(pid){
         +'<div class="pt-info"><div class="extra-fields">'
         +'<div class="extra-preset"><select onchange="applyWeekExtraOption(\''+pid+'\','+di+','+idx+',this.value)"><option value="">Chantier de la semaine…</option>'+catalog.map(function(opt,cidx){var sel=((opt.num||'')===String(it.num||'').trim()&&(opt.nom||'')===String(it.nom||'').trim())?' selected':''; return '<option value="'+cidx+'"'+sel+'>'+weekChantierLabel(opt)+'</option>';}).join('')+'</select></div>'
         +'<button class="num-field-btn" onclick="openExtraNumPad(\''+pid+'\','+di+','+idx+')">'+((it.num||'').trim()?escAttr(it.num):'N° chantier')+'</button>'
-        +'<input placeholder="Libellé" value="'+escAttr(it.nom||'')+'" oninput="setExtraField(\''+pid+'\','+di+','+idx+',\'nom\',this.value)"/>'
+        +'<input placeholder="Libellé" value="'+escAttr(it.nom||'')+'" onchange="setExtraField(\''+pid+'\','+di+','+idx+',\'nom\',this.value)"/>'
         +'</div></div>'
         +'<div class="hctrl"><button onclick="adjustPointage(\''+pid+'\','+di+','+idx+',true,-0.25)">−</button><button class="hval-btn" onclick="openHoursPad(\''+pid+'\','+di+','+idx+',true)">'+fmtHShort(it.h)+'</button><button onclick="adjustPointage(\''+pid+'\','+di+','+idx+',true,0.25)">+</button></div>'
         +'<button class="mini-btn" style="color:#dc2626" onclick="removeExtraTask(\''+pid+'\','+di+','+idx+')">✕</button>'
@@ -1231,7 +1231,7 @@ function openHoursPad(pid,di,idx,isExtra){
 }
 function openExtraNumPad(pid,di,idx){
   var day=getPointageDay(pid,di); if(!day.extras[idx]) return;
-  openNumPad({title:'N° chantier',mode:'integer',value:String(day.extras[idx].num||''),onSave:function(v){var d=getPointageDay(pid,di); if(!d.extras[idx]) return; d.extras[idx].num=String(v||'').replace(/\D/g,''); savePointageDay(pid,di,d,null); renderPointage();}});
+  openNumPad({title:'N° chantier',mode:'integer',value:'',onSave:function(v){var d=getPointageDay(pid,di); if(!d.extras[idx]) return; d.extras[idx].num=String(v||'').replace(/\D/g,''); savePointageDay(pid,di,d,null); renderPointage();}});
 }
 
 function openNumPad(cfg){
